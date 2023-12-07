@@ -162,8 +162,8 @@
                             <h3>j ai une question sur le code html et css ?</h3>
                         </a>
                         <div class="d-flex gap-2 mt-2">
-                            <p class="btn btn-outline-primary">html</p>
-                            <p class="btn btn-outline-primary">css</p>
+                            <p class="btn btn-outline-primary btn-sm">html</p>
+                            <p class="btn btn-outline-primary btn-sm">css</p>
                         </div>
                         <div class="card-footer d-flex justify-content-end gap-3">
                             <p><i class="bi bi-chat"></i> Répondre</p>
