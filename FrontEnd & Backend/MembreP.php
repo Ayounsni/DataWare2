@@ -84,7 +84,7 @@ $user= $_SESSION['username'];
                                     <td><?php echo $row['First_name'];?></td>
                                     <td><?php echo $row['email'];?></td>
                                     <td><?php echo $row['role'];?></td>
-                                    <td><a href="modifierRole.php?id=<?=$row['id_user']?>" class="ms-5"><i
+                                    <td><a href="Modifier_Role.php?id=<?=$row['id_user']?>" class="ms-5"><i
                                                 class="bi bi-pencil"></i></a></th>
 
 
