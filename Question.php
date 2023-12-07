@@ -8,16 +8,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Retrieve the value of 'id_question'
         $id_question = $_POST['id_question'];
 
-        $result_id_questions = mysqli_query($con, "SELECT  id_question FROM questions");
+        $result_id_questions = mysqli_query($con, "SELECT  id_question FROM questions where id_question = $id_question ");
 
-        $result_title = mysqli_query($con, "SELECT titre FROM questions where id_question = $id_question  ");
+        $result_questions = mysqli_query($con, "SELECT  contenu FROM questions where id_question = $id_question");
+
+        $result_title = mysqli_query($con, "SELECT titre FROM questions where id_question = $id_question");
 
         $result_tags = mysqli_query($con, "SELECT nom_tag FROM tags");
 
-        $result_date = mysqli_query($con, "SELECT date_creation FROM questions  where id_question = $id_question");
+        $result_date = mysqli_query($con, "SELECT date_creation FROM questions where id_question = $id_question");
 
-        $result_contenu = mysqli_query($con, "SELECT contenu FROM questions  where id_question = $id_question");
 
+
+
+        // Fetch responses data
+        $query_responses = "SELECT date_creation, contenu FROM reponses WHERE question_id = $id_question";
+        $result_responses = mysqli_query($con, $query_responses);
     } else {
         // Handle the case when 'id_question' is not set in the POST data
         echo "Error: id_question is not set in the POST data.";
@@ -89,14 +95,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ($row_title = mysqli_fetch_array($result_title)) &&
                         ($row_tags = mysqli_fetch_array($result_tags)) &&
                         ($row_date = mysqli_fetch_array($result_date)) &&
-                        ($row_contenu = mysqli_fetch_array($result_contenu)) &&
-                        ($row_id_questions = mysqli_fetch_array($result_id_questions)) 
-                        ) {
+                        ($row_contenu = mysqli_fetch_array($result_questions)) &&
+                        ($row_id_questions = mysqli_fetch_array($result_id_questions))
+                    ) {
                     ?>
                         <h3 class="mt-3"><?php echo $row_title['titre']; ?> </h3>
                         <div class="jumbotron bg w-75 ">
                             <p class="lead mt-3 p-2">
-                            <?php echo $row_contenu['contenu']; ?>
+                                <?php echo $row_contenu['contenu']; ?>
                             </p>
                             <hr class="my-4">
                             <div class="d-flex justify-content-between px-2">
@@ -110,15 +116,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         </svg>
                                     </button>
                                 </form>
-                                
-                            <form method="post" action="delete Q/deleteQuestionform.php">
-                            <input type="" name="id_question" value="<?php echo $row_id_questions['id_question']; ?>">
-                                <button type="submit" class="text-gray-500 transition-colors duration-200 dark:hover:text-red-500 dark:text-gray-300 hover:text-red-500 focus:outline-none j-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                                    </svg>
-                                </button>
-                            </form>
+
+                                <form method="post" action="delete Q/deleteQuestionform.php">
+                                    <input type="hidden" name="id_question" value="<?php echo $row_id_questions['id_question']; ?>">
+                                    <button type="submit" class="text-gray-500 transition-colors duration-200 dark:hover:text-red-500 dark:text-gray-300 hover:text-red-500 focus:outline-none j-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                        </svg>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     <?php
@@ -127,35 +133,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <h2 class="fw-lighter text-primary mt-3">Réponses</h2>
                 <div class="jumbotron bg w-75 mt-2">
-                    <p class="lead mt-3 p-2">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.
-                        This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured
-                        This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured
-                    </p>
-                    <hr class="my-4">
-                    <div class="d-flex justify-content-between px-2">
-                        <p>Répondre par : <span class="text-danger">zouhair ghoumri</span></p>
-                        <div class="d-flex justify-content-center gap-3">
-                            <p onclick="myFunction(this)" class="like"><i class="fa fa-thumbs-up"></i> 1</p>
-                            <p onclick="yourFunction(this)" class="dislike"><i class="fa fa-thumbs-down"></i> 1</p>
-                        </div>
-                        <p>Répondre le : <span class="text-primary">2023-02-27</span></p>
-                    </div>
+                    <?php
+                    $query_responses = "SELECT date_creation, contenu FROM reponses WHERE question_id = $id_question";
+                    $result_responses = mysqli_query($con, $query_responses);
+
+                    if ($result_responses) {
+                        while ($row_response = mysqli_fetch_array($result_responses)) {
+                    ?>
+                            <p class="lead mt-3 p-2">
+                                <?php echo $row_response['contenu']; ?>
+                            </p>
+                            <hr class="my-4">
+                            <div class="d-flex justify-content-between px-2">
+                                <p>Répondre par : <span class="text-danger">zouhair ghoumri</span></p>
+                                <div class="d-flex justify-content-center gap-3">
+                                    <p onclick="myFunction(this)" class="like"><i class="fa fa-thumbs-up"></i> 1</p>
+                                    <p onclick="yourFunction(this)" class="dislike"><i class="fa fa-thumbs-down"></i> 1</p>
+                                </div>
+                                <p>Répondre le : <span class="text-primary"><?php echo $row_response['date_creation']; ?></span></p>
+                            </div>
+                        <?php
+                        }
+
+                        // Check if there are no responses
+                        if (mysqli_num_rows($result_responses) === 0) {
+                        ?>
+                            <p class="lead mt-3">Aucune réponse disponible pour le moment.</p>
+                    <?php
+                        }
+
+                        // Free the result set
+                        mysqli_free_result($result_responses);
+                    } else {
+                        // Handle the case when the query execution fails
+                        echo "Error: Unable to fetch responses.";
+                    }
+                    ?>
+
                 </div>
-                <form action="" class="w-75 ">
+                <form action="reponce.php" class="w-75" method="POST">
                     <h2 class="fw-lighter text-primary mt-3">Répondre</h2>
-                    <div class="form-floating mt-3  ">
-                        <textarea class="form-control bg h-80" placeholder="Leave a comment here" id="floatingTextarea"></textarea>
-                        <label for="floatingTextarea">Votre reponse</label>
+                    <div class="form-floating mt-3">
+                        <input type="hidden" name="id_question" value="<?php echo $row_id_questions['id_question']; ?>">
+                        <textarea name="reponce" class="form-control bg h-80" placeholder="Leave a comment here" id="floatingTextarea"></textarea>
+                        <label for="floatingTextarea">Votre réponse</label>
                     </div>
                     <div class="d-flex justify-content-end">
                         <button type="submit" class="col-md-auto col-sm-12 bg-primary p-2 rounded-3 text-light text-decoration-none btn mt-2">
-                            <i class="bi bi-file-post"></i> Publier votre réponse</button>
+                            <i class="bi bi-file-post"></i> Publier votre réponse
+                        </button>
                     </div>
                 </form>
-
-
-
-
                 <script>
                     function myFunction(x) {
                         x.classList.toggle("text-success");

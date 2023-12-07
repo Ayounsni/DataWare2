@@ -116,7 +116,7 @@ $result_date = mysqli_query($con, "SELECT date_creation FROM questions");
                                 </div>
                                     <div class="card-footer d-flex justify-content-end gap-3">
                                         <form method="POST" action="Question.php">
-                                            <input type="hidden" name="id_question" value="<?php echo $row_id_questions['id_question']; ?>">
+                                            <input type="" name="id_question" value="<?php echo $row_id_questions['id_question']; ?>">
                                             <button type="submit"></button>
                                         </form>
 
