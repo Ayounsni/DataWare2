@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_question'])) {
     mysqli_query($con, $delete_query);
 
     // Redirect back to the page after deletion
-    header('Location: ../Q&A.php');
+    header('Location: ../community.php');
     exit();
 } else {
 }

@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Check if both queries were successful
     if ($result_questions && $result_Tags) {
         echo "Data inserted successfully into both tables.";
-        header('Location: ../Q&A.php');
+        header('Location: ../community.php');
     } else {
         echo "Error: " . mysqli_error($con);
     }

@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contenu']) && isset($
     mysqli_query($con, $update_query);
 
     // Redirect back to the page after modification
-    header('Location: ../Q&A.php');
+    header('Location: ../Question.php');
     exit();
 } else {
     // Handle the case when the form is not submitted properly
