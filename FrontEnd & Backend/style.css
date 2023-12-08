@@ -31,7 +31,7 @@
   height: 3.5rem;
 }
 body{
-    background-color:  #ffffff;
+    background-color:  #f0ebf8;
 }
 .blockquote-custom-icon {
   width: 50px;
@@ -44,3 +44,18 @@ body{
   top: -40px;
   left: 19px;
 }
+.like:hover{
+  font-size: 17px;
+  color: #198754;
+}
+.dislike:hover{
+  font-size: 17px;
+  color: #DC3545;
+}
+.bg{
+  background-color: #e9ecef;
+}
+.h-80{
+  height: 200px !important;
+}
+
