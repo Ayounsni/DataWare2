@@ -18,11 +18,37 @@ $user= $_SESSION['username'];
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="FrontEnd & Backend/style.css" type="text/css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js">
-    </script>
-
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
     <title>Document</title>
+
+    <script>
+    $(document).ready(function () {
+        $('#myInput').on('keyup', function () {
+            let inputValue = this.value;
+            let outputDiv = "#result"; // Utilisez le même ID que celui dans votre page pagination.php
+            console.log('inputValue ', inputValue);
+
+            if (inputValue != "") { // input received
+                $.ajax({
+                    url: "Rechercher_Questions.php",
+                    data: {'input': inputValue},
+                    dataType: "html",
+                    type: "POST",
+                    success: function (response) {
+                        $(outputDiv).empty().html(response);
+                    }
+                });
+            } else { // no input found
+                let msg = "Veuillez taper votre question ou le tag.";
+                $('.errMsg').text(msg);
+                $(outputDiv).empty(); // Vide la div des résultats en cas de champ de recherche vide
+            }
+        });
+    });
+</script>
+
+
 </head>
 
 <body>
@@ -32,7 +58,7 @@ $user= $_SESSION['username'];
 
                 <img src="Image/log.png" alt="logo" class="rounded-4" style="width: 80px; height: 60px;">
                 <div class="input-group w-50 ms-md-4 ">
-                    <input type="search" class="form-control rounded" placeholder="Search" aria-label="Search"
+                    <input type="search" id="myInput" class="form-control rounded" placeholder="Search" aria-label="Search"
                         aria-describedby="search-addon" />
                     <button type="button" class="btn btn-outline-primary" data-mdb-ripple-init><i
                             class="bi bi-search"></i></button>
@@ -108,7 +134,6 @@ $user= $_SESSION['username'];
 
 
                 </div>
-
 
             </div>
 

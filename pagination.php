@@ -59,7 +59,6 @@ if ($row_count > 0) {
         $output .= "<li class='page-item  {$active}'><a class='page-link ' id='{$i}'>{$i}</a></li>";
     }
     $output .= '</ul>';
-
     echo $output;
 } else {
     echo "Aucun résultat trouvé.";
