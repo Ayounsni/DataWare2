@@ -1,4 +1,22 @@
 <?php
+session_start();
+include "FrontEnd & Backend/connexion.php";
+$message="";
+$question_id = $_GET['id'];
+$user= $_SESSION['username'];
+$sql = "SELECT * FROM questions INNER JOIN users ON questions.user_id  = users.id_user WHERE questions.id_question = $question_id ";
+
+$result = mysqli_query($conn, $sql);
+$row = mysqli_fetch_assoc($result);
+$membre= $_SESSION['id'];
+
+if (isset($_POST["submit"])) {
+    $text = $_POST["text"];
+    
+    $requete = "INSERT INTO reponses (user_id , question_id, contenu) VALUES ('$membre', '$question_id', '$text')";
+      $query = mysqli_query($conn, $requete);
+      header("Location: Question.php?id=$question_id");
+  }
 
 ?>
 <!DOCTYPE html>
@@ -60,7 +78,7 @@
 
         <div class="d-flex flex-lg-row justify-content-between flex-sm-column flex-md-column">
             <div class="d-flex justify-content-center mt-3 w-25 p-3 d-none d-lg-block ">
-                <a href="#"
+                <a href="community.php"
                     class="col-md-auto col-sm-12 bg-danger p-2 rounded-3 text-light text-decoration-none btn mt-1 w-100"><i
                         class="bi bi-arrow-return-left"></i> Retour</a>
                 <a href="#"
@@ -72,80 +90,81 @@
 
                 <div class="d-flex  flex-column align-items-start  ">
                     <h2 class="fw-lighter text-primary mt-3">Questions</h2>
-                    <h3 class="mt-3">J'ai une question sur le code html et css ? </h3>
+                    <h3 class="mt-3"><?php echo $row['titre']; ?></h3>
                     <div class="jumbotron bg w-75 ">
-                        <p class="lead mt-3 p-2">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.
-                            This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured  
-                        </p>
+                        <p class="lead mt-3 p-2"><?php echo $row['contenu']; ?> </p>
                         <hr class="my-4">
                         <div class="d-flex justify-content-between px-2">
-                            <p>Poser par : <span class="text-danger">Ayoub Snini</span></p>
-                            <p>Poser le : <span class="text-primary">2023-02-27</span></p>
+                            <p>Poser par : <span
+                                    class="text-danger"><?php echo $row['First_name']. ' ' . $row['Last_name'] ; ?></span>
+                            </p>
+                            <p>Poser le : <span class="text-primary"><?php echo $row['date_creation']; ?></span></p>
                         </div>
-                       
-                      </div>
-                      <h2 class="fw-lighter text-primary mt-3">Réponses</h2>
-                      <div class="jumbotron bg w-75 mt-2">
-                        <p class="lead mt-3 p-2">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.
-                            This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured
-                            This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured
-                        </p>
-                        <hr class="my-4">
-                        <div class="d-flex justify-content-between px-2">
-                            <p>Répondre par : <span class="text-danger">zouhair ghoumri</span></p>
-                            <div class="d-flex justify-content-center gap-3">
-                                <p onclick="myFunction(this)" class="like"><i class="fa fa-thumbs-up"></i> 1</p>
-                                <p onclick="yourFunction(this)" class="dislike"><i class="fa fa-thumbs-down"></i> 1</p>
-                            </div>
-                            <p>Répondre le : <span class="text-primary">2023-02-27</span></p>
-                        </div>
-                        
-                    
-                  
-                
-                       
                     </div>
+                    <h2 class="fw-lighter text-primary mt-3">Réponses</h2>
+                    <?php
+
+$sql = "SELECT * FROM reponses INNER JOIN users ON reponses.user_id  = users.id_user WHERE reponses.question_id = $question_id ";
+
+$result = mysqli_query($conn, $sql);
+
+if(mysqli_num_rows($result) == 0){
+    $message="Il n'y a pas encore de réponse.";
+    
+   } else{
+    while ($row = mysqli_fetch_assoc($result)) {
+        ?>
                     <div class="jumbotron bg w-75 mt-2">
-                        <p class="lead mt-3 p-2">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.
-                            This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured
-                            This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured
-                        </p>
+                        <p class="lead mt-3 p-2"><?php echo $row['contenu']; ?> </p>
                         <hr class="my-4">
                         <div class="d-flex justify-content-between px-2">
-                            <p>Répondre par : <span class="text-danger">zouhair ghoumri</span></p>
+                            <p>Répondre par : <span
+                                    class="text-danger"><?php echo $row['First_name']. ' ' . $row['Last_name'] ; ?></span>
+                            </p>
                             <div class="d-flex justify-content-center gap-3">
                                 <p onclick="myFunction(this)" class="like"><i class="fa fa-thumbs-up"></i> 1</p>
                                 <p onclick="yourFunction(this)" class="dislike"><i class="fa fa-thumbs-down"></i> 1</p>
                             </div>
-                            <p>Répondre le : <span class="text-primary">2023-02-27</span></p>
+                            <p>Répondre le : <span class="text-primary"><?php echo $row['date_creation']; ?></span></p>
                         </div>
                     </div>
-                    <form action="" class="w-75 ">
+                    <?php
+    }
+} 
+?>
+                    <p class="text-center fs-5 fw-bolder text-danger"><?php echo $message;?></p>
+
+
+
+                    <form method="post" action="" class="w-75 ">
                         <h2 class="fw-lighter text-primary mt-3">Répondre</h2>
                         <div class="form-floating mt-3  ">
-                            <textarea class="form-control bg h-80"  placeholder="Leave a comment here" id="floatingTextarea"></textarea>
+                            <textarea name="text" class="form-control bg h-80" placeholder="Leave a comment here"
+                                id="floatingTextarea"></textarea>
                             <label for="floatingTextarea">Votre reponse</label>
-                          </div>
-                          <div class="d-flex justify-content-end">
-                                <button type="submit" class="col-md-auto col-sm-12 bg-primary p-2 rounded-3 text-light text-decoration-none btn mt-2">
-                                    <i class="bi bi-file-post"></i> Publier votre réponse</button>
-                                </div>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" name="submit"
+                                class="col-md-auto col-sm-12 bg-primary p-2 rounded-3 text-light text-decoration-none btn mt-2">
+                                <i class="bi bi-file-post"></i> Publier votre réponse</button>
+                        </div>
                     </form>
 
-            
-                        
+
+
 
                     <script>
-                        function myFunction(x) {
-                            x.classList.toggle("text-success");
-                        }
-                
-                        function yourFunction(x) {
-                            x.classList.toggle("text-danger");
-                        }
-                        </script>
+                    function myFunction(x) {
+                        x.classList.toggle("text-success");
+                    }
 
-                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+                    function yourFunction(x) {
+                        x.classList.toggle("text-danger");
+                    }
+                    </script>
+
+                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
+                    </script>
 
 
 </body>
