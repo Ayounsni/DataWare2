@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+
+    <!-- jquery cdn include -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#myInput').on('keyup', function () {
+                let inputValue = this.value;
+                let errMsg = "";
+                let outputDiv = ".result";
+                console.log('inputValue ', inputValue);
+
+                if (inputValue != "") { // input received
+                    $.ajax({
+                        url: "rechque.php", // Remplacez par le nom réel de ce fichier PHP
+                        data: {'input': inputValue},
+                        dataType: "html",
+                        type: "POST",
+                        success: function (response) {
+                            // console.log('response ', response);
+                            $(outputDiv).empty().html(response);
+                        }
+                    });
+                } else { // no input found
+                    let msg = "Veuillez taper votre question ou le tag.";
+                    $('.errMsg').text(msg);
+                }
+
+            });
+        });
+
+    </script>
+
+</head>
+<body>
+
+<h2>Recherche de Questions</h2>
+
+<input type="text" id="myInput" placeholder="Rechercher par titre ou tag" title="Tapez un titre ou un tag">
+
+<div class="errMsg"></div>
+<div class="result"></div>
+
+</body>
+</html>
