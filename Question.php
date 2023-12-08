@@ -3,6 +3,7 @@ session_start();
 include "FrontEnd & Backend/connexion.php";
 $message="";
 $question_id = $_GET['id'];
+$_SESSION['question'] = $_GET['id'];
 $user= $_SESSION['username'];
 $sql = "SELECT * FROM questions INNER JOIN users ON questions.user_id  = users.id_user WHERE questions.id_question = $question_id ";
 
@@ -128,16 +129,23 @@ if(mysqli_num_rows($result) == 0){
                 // Check if the response belongs to the current user
                 if ($row['user_id'] == $membre) {
                     ?>
-                            <a href="supprimer_reponse.php?id=<?php echo $row['id_reponse']; ?>"
-                                class="text-danger ms-4 text-center">
-                                <i class=" text-center bi-trash3-fill"></i>
-                            </a>
+                            <div class="d-flex justify-content-center me-5">
+                                <a href="supprimer_reponse.php?id=<?php echo $row['id_reponse']; ?>"
+                                    class="text-danger ms-4 text-center">
+                                    <i class=" bi-trash3-fill"></i>
+                                </a>
+                                <a href="supprimer_reponse.php?id=<?php echo $row['id_reponse']; ?>"
+                                    class="text-primary ms-4 text-center">
+                                    <i class=" bi bi-pencil"></i>
+                                </a>
+                            </div>
                             <?php
                 }
                 ?>
                             <div class="d-flex justify-content-center gap-3">
                                 <p onclick="myFunction(this)" class="like"><i class="fa fa-thumbs-up"></i> 1</p>
-                                <p onclick="yourFunction(this)" class="dislike"><i class="fa fa-thumbs-down"></i> 1</p>
+                                <p onclick="yourFunction(this)" class="dislike"><i class="fa fa-thumbs-down"></i> 1
+                                </p>
                             </div>
                         </div>
                     </div>

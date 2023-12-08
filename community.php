@@ -18,7 +18,9 @@ $user= $_SESSION['username'];
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="FrontEnd & Backend/style.css" type="text/css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js">
+    </script>
+
 
     <title>Document</title>
 </head>
@@ -70,9 +72,12 @@ $user= $_SESSION['username'];
                 <div class="form-floating w-100">
                     <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
                         <option selected>All</option>
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Three</option>
+                        <?php
+                                $queryProjets = mysqli_query($conn, "SELECT * FROM projets");
+                                while ($Projets = mysqli_fetch_assoc($queryProjets)) {
+                                 echo "<option value='{$Projets['nom_projet']}'>{$Projets['nom_projet']}</option>";
+                              }
+                               ?>
                     </select>
                     <label for="floatingSelect">Filtrer question par projet</label>
                 </div>
@@ -97,13 +102,13 @@ $user= $_SESSION['username'];
                         class="col-md-auto col-sm-12 bg-primary p-2 rounded-3 text-light text-decoration-none btn mt-4 w-75"><i
                             class="bi bi-bookmark-plus-fill"></i> Poser une question </a>
 
-                            
-    <div id="result"  class="d-flex flex-column align-items-center w-100"></div> 
+
+                    <div id="result" class="d-flex flex-column align-items-center w-100"></div>
 
 
 
                 </div>
-              
+
 
             </div>
 
@@ -129,23 +134,25 @@ $user= $_SESSION['username'];
 
 </html>
 <script type="text/javascript">
-    $(document).ready(function () {
-        showdata();
-    });
+$(document).ready(function() {
+    showdata();
+});
 
-    function showdata(page) {
-        $.ajax({
-            url: 'pagination.php',
-            method: 'post',
-            data: {page_no: page},
-            success: function (result) {
-                $("#result").html(result);
-            }
-        });
-    }
-
-    $(document).on("click", ".pagination a", function () {
-        var page = $(this).attr('id');
-        showdata(page);
+function showdata(page) {
+    $.ajax({
+        url: 'pagination.php',
+        method: 'post',
+        data: {
+            page_no: page
+        },
+        success: function(result) {
+            $("#result").html(result);
+        }
     });
+}
+
+$(document).on("click", ".pagination a", function() {
+    var page = $(this).attr('id');
+    showdata(page);
+});
 </script>
