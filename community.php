@@ -18,6 +18,7 @@ $user= $_SESSION['username'];
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="FrontEnd & Backend/style.css" type="text/css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
     <title>Document</title>
 </head>
@@ -95,80 +96,14 @@ $user= $_SESSION['username'];
                     <a href="#"
                         class="col-md-auto col-sm-12 bg-primary p-2 rounded-3 text-light text-decoration-none btn mt-4 w-75"><i
                             class="bi bi-bookmark-plus-fill"></i> Poser une question </a>
-                    <div class="d-flex  flex-column align-items-center w-100">
 
-                        <?php
+                            
+    <div id="result"  class="d-flex flex-column align-items-center w-100"></div> 
 
-$sql = "SELECT * FROM questions INNER JOIN users ON questions.user_id  = users.id_user ORDER BY questions.date_creation DESC";
-
-$result = mysqli_query($conn, $sql);
-
-if ($result) {
-    while ($row = mysqli_fetch_assoc($result)) {
-        $question_id = $row['id_question'];
-        ?>
-                        <div class="card w-75 mt-4">
-                            <div class="card-header d-flex justify-content-between text-danger">
-                                <p><?php echo $row['First_name']. ' ' . $row['Last_name'] ; ?></p>
-                                <p><?php echo $row['date_creation']; ?></p>
-                            </div>
-                            <div class="card-body d-flex flex-column">
-                                <a href="Question.php?id=<?=$row['id_question']?>"
-                                    class="text-decoration-none text-dark">
-                                    <h3><?php echo $row['titre']; ?></h3>
-                                </a>
-                                <div class="d-flex gap-2 mt-2">
-                                    <!-- Affichez ici les balises des tags -->
-                                    <?php
-                             $sqle = "SELECT * FROM questions 
-                             JOIN question_tags ON questions.id_question = question_tags.question_id
-                             JOIN tags  ON question_tags.tag_id = tags.id_tag WHERE questions.id_question = $question_id";
-                     
-                     $resulte = mysqli_query($conn, $sqle);
-                            while ($row = mysqli_fetch_assoc($resulte)) {
-                                ?>
-                                    <p class="btn btn-outline-primary"><?php echo $row['nom_tag']; ?></p>
-                                    <?php
-                            }
-                            ?>
-                                </div>
-                                <div class="card-footer d-flex justify-content-end gap-3">
-                                    <p><i class="bi bi-chat"></i> Répondre</p>
-                                    <p onclick="myFunction(this)" class="like"><i class="fa fa-thumbs-up"></i> 1</p>
-                                    <p onclick="yourFunction(this)" class="dislike"><i class="fa fa-thumbs-down"></i> 1
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <?php
-    }
-} 
-?>
-                    </div>
 
 
                 </div>
-                <div class="d-flex justify-content-center align-items-center mt-3">
-                    <nav aria-label="Page navigation example">
-                        <ul class="pagination">
-                            <li class="page-item">
-                                <a class="page-link" href="#" aria-label="Previous">
-                                    <span aria-hidden="true">&laquo;</span>
-                                    <span class="sr-only">Previous</span>
-                                </a>
-                            </li>
-                            <li class="page-item"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#" aria-label="Next">
-                                    <span aria-hidden="true">&raquo;</span>
-                                    <span class="sr-only">Next</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
+              
 
             </div>
 
@@ -193,3 +128,24 @@ if ($result) {
 </body>
 
 </html>
+<script type="text/javascript">
+    $(document).ready(function () {
+        showdata();
+    });
+
+    function showdata(page) {
+        $.ajax({
+            url: 'pagination.php',
+            method: 'post',
+            data: {page_no: page},
+            success: function (result) {
+                $("#result").html(result);
+            }
+        });
+    }
+
+    $(document).on("click", ".pagination a", function () {
+        var page = $(this).attr('id');
+        showdata(page);
+    });
+</script>
