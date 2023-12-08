@@ -95,8 +95,9 @@ $user= $_SESSION['username'];
                     <a href="#"
                         class="col-md-auto col-sm-12 bg-primary p-2 rounded-3 text-light text-decoration-none btn mt-4 w-75"><i
                             class="bi bi-bookmark-plus-fill"></i> Poser une question </a>
+                    <div class="d-flex  flex-column align-items-center w-100">
 
-                    <?php
+                        <?php
 
 $sql = "SELECT * FROM questions INNER JOIN users ON questions.user_id  = users.id_user ORDER BY questions.date_creation DESC";
 
@@ -106,18 +107,19 @@ if ($result) {
     while ($row = mysqli_fetch_assoc($result)) {
         $question_id = $row['id_question'];
         ?>
-                    <div class="card w-75 mt-4">
-                        <div class="card-header d-flex justify-content-between text-danger">
-                            <p><?php echo $row['First_name']. ' ' . $row['Last_name'] ; ?></p>
-                            <p><?php echo $row['date_creation']; ?></p>
-                        </div>
-                        <div class="card-body d-flex flex-column">
-                            <a href="Question.php?id=<?=$row['id_question']?>" class="text-decoration-none text-dark">
-                                <h3><?php echo $row['titre']; ?></h3>
-                            </a>
-                            <div class="d-flex gap-2 mt-2">
-                                <!-- Affichez ici les balises des tags -->
-                                <?php
+                        <div class="card w-75 mt-4">
+                            <div class="card-header d-flex justify-content-between text-danger">
+                                <p><?php echo $row['First_name']. ' ' . $row['Last_name'] ; ?></p>
+                                <p><?php echo $row['date_creation']; ?></p>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <a href="Question.php?id=<?=$row['id_question']?>"
+                                    class="text-decoration-none text-dark">
+                                    <h3><?php echo $row['titre']; ?></h3>
+                                </a>
+                                <div class="d-flex gap-2 mt-2">
+                                    <!-- Affichez ici les balises des tags -->
+                                    <?php
                              $sqle = "SELECT * FROM questions 
                              JOIN question_tags ON questions.id_question = question_tags.question_id
                              JOIN tags  ON question_tags.tag_id = tags.id_tag WHERE questions.id_question = $question_id";
@@ -125,23 +127,24 @@ if ($result) {
                      $resulte = mysqli_query($conn, $sqle);
                             while ($row = mysqli_fetch_assoc($resulte)) {
                                 ?>
-                                <p class="btn btn-outline-primary"><?php echo $row['nom_tag']; ?></p>
-                                <?php
+                                    <p class="btn btn-outline-primary"><?php echo $row['nom_tag']; ?></p>
+                                    <?php
                             }
                             ?>
-                            </div>
-                            <div class="card-footer d-flex justify-content-end gap-3">
-                                <p><i class="bi bi-chat"></i> Répondre</p>
-                                <p onclick="myFunction(this)" class="like"><i class="fa fa-thumbs-up"></i> 1</p>
-                                <p onclick="yourFunction(this)" class="dislike"><i class="fa fa-thumbs-down"></i> 1
-                                </p>
+                                </div>
+                                <div class="card-footer d-flex justify-content-end gap-3">
+                                    <p><i class="bi bi-chat"></i> Répondre</p>
+                                    <p onclick="myFunction(this)" class="like"><i class="fa fa-thumbs-up"></i> 1</p>
+                                    <p onclick="yourFunction(this)" class="dislike"><i class="fa fa-thumbs-down"></i> 1
+                                    </p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <?php
+                        <?php
     }
 } 
 ?>
+                    </div>
 
 
                 </div>

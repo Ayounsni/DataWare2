@@ -115,17 +115,31 @@ if(mysqli_num_rows($result) == 0){
     while ($row = mysqli_fetch_assoc($result)) {
         ?>
                     <div class="jumbotron bg w-75 mt-2">
-                        <p class="lead mt-3 p-2"><?php echo $row['contenu']; ?> </p>
+                        <div class="d-flex justify-content-end pt-2 px-3">
+                            <p> <span class="text-primary"><?php echo $row['date_creation']; ?></span></p>
+                        </div>
+                        <p class="lead  px-2"><?php echo $row['contenu']; ?> </p>
                         <hr class="my-4">
                         <div class="d-flex justify-content-between px-2">
                             <p>Répondre par : <span
                                     class="text-danger"><?php echo $row['First_name']. ' ' . $row['Last_name'] ; ?></span>
                             </p>
+                            <?php
+                // Check if the response belongs to the current user
+                if ($row['user_id'] == $membre) {
+                    ?>
+                            <a href="supprimer_reponse.php?id=<?php echo $row['id_reponse']; ?>"
+                                class="text-danger ms-4 text-center">
+                                <i class=" text-center bi-trash3-fill"></i>
+                            </a>
+                            <?php
+                }
+                ?>
                             <div class="d-flex justify-content-center gap-3">
                                 <p onclick="myFunction(this)" class="like"><i class="fa fa-thumbs-up"></i> 1</p>
                                 <p onclick="yourFunction(this)" class="dislike"><i class="fa fa-thumbs-down"></i> 1</p>
                             </div>
-                            <p>Répondre le : <span class="text-primary"><?php echo $row['date_creation']; ?></span></p>
+
                         </div>
                     </div>
                     <?php
@@ -133,8 +147,6 @@ if(mysqli_num_rows($result) == 0){
 } 
 ?>
                     <p class="text-center fs-5 fw-bolder text-danger"><?php echo $message;?></p>
-
-
 
                     <form method="post" action="" class="w-75 ">
                         <h2 class="fw-lighter text-primary mt-3">Répondre</h2>
