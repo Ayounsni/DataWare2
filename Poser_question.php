@@ -126,7 +126,7 @@ $select="SELECT * FROM users WHERE id_user=$membre";
                                             chaque tag virgule "," )</label>
                                     </div>
                                     <button
-                                        class="btn btn-primary h-100 align-middle align-self-center btn-lg btn-block btn-sm"
+                                        class="btn btn-primary h-100 align-middle align-self-center btn-md btn-block "
                                         type="submit" name="sub">Ajouter</button>
 
                                 </div>
@@ -181,7 +181,7 @@ $select="SELECT * FROM users WHERE id_user=$membre";
                                         ?>
                                     </select>
                                     <div class="pt-1 mb-3 d-flex mt-2 justify-content-end">
-                                        <button class="btn btn-primary btn-lg btn-block btn-sm" type="submit"
+                                        <button class="btn btn-primary btn-md btn-block " type="submit"
                                             name="submit">Valider</button>
                                     </div>
                                 </div>

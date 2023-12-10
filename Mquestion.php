@@ -2,8 +2,7 @@
 session_start();
 include "FrontEnd & Backend/connexion.php";
 $message="";
-
-
+$membre= $_SESSION['id'];
 $user= $_SESSION['username'];
 
 ?>
@@ -93,10 +92,70 @@ $user= $_SESSION['username'];
 
 
                     <div class="d-flex flex-column align-items-center w-100">
-                        <?php $sql = "SELECT * FROM questions INNER JOIN users ON questions.user_id = users.id_user";
-                        $fetch_query = mysqli_query($conn, $sql);
-                        
-                        ?>
+                        <?php
+
+$sql = "SELECT * FROM questions 
+        INNER JOIN users ON questions.user_id = users.id_user INNER JOIN projets ON questions.projet_id = projets.id_projets
+        WHERE users.id_user = $membre 
+        ORDER BY questions.date_creation DESC";
+$result = mysqli_query($conn, $sql);
+
+if ($result) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $question_id = $row['id_question'];
+        ?>
+                        <div class="card w-75 mt-4 mb-3">
+                            <div class="card-header d-flex justify-content-between text-danger">
+                                <p><?php echo $row['First_name']. ' ' . $row['Last_name'] ; ?></p>
+                                <p><?php echo $row['date_creation']; ?></p>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <a href="Question.php?id=<?=$row['id_question']?>"
+                                    class="text-decoration-none text-dark">
+                                    <h3><?php echo $row['titre']; ?></h3>
+                                </a>
+                                <div class="d-flex gap-2 mt-2">
+                                    <!-- Affichez ici les balises des tags -->
+                                    <?php
+                             $sqle = "SELECT * FROM questions 
+                             JOIN question_tags ON questions.id_question = question_tags.question_id
+                             JOIN tags  ON question_tags.tag_id = tags.id_tag WHERE questions.id_question = $question_id";
+                     
+                     $resulte = mysqli_query($conn, $sqle);
+                            while ($rows = mysqli_fetch_assoc($resulte)) {
+                                ?>
+                                    <p class="btn btn-outline-primary"><?php echo $rows['nom_tag']; ?></p>
+                                    <?php
+                            }
+                            ?>
+                                </div>
+                                <div class="card-footer d-flex justify-content-between">
+                                    <p class="fw-bold">Projet : <span class="text-danger fw-normal">
+                                            <?php echo $row['nom_projet']; ?></span></p>
+                                    <div class="d-flex justify-content-center me-5">
+                                        <a href="supprimer_question.php?id=<?php echo $row['id_question']; ?>"
+                                            class="text-danger ms-4 text-center">
+                                            <i class=" bi-trash3-fill"></i>
+                                        </a>
+                                        <a href="modifQ.php?id=<?php echo $row['id_question']; ?>"
+                                            class="text-primary ms-4 text-center">
+                                            <i class=" bi bi-pencil"></i>
+                                        </a>
+                                    </div>
+                                    <div class=" d-flex justify-content-end gap-3">
+                                        <p><i class="bi bi-chat"></i> Répondre</p>
+                                        <p onclick="myFunction(this)" class="like"><i class="fa fa-thumbs-up"></i> 1</p>
+                                        <p onclick="yourFunction(this)" class="dislike"><i
+                                                class="fa fa-thumbs-down"></i> 1
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <?php
+    }
+} 
+?>
 
                     </div>
 

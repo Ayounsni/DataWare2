@@ -129,7 +129,7 @@ $user= $_SESSION['username'];
                     <a href="poser_question.php"
                         class="col-md-auto col-sm-12 bg-primary p-2 rounded-3 text-light text-decoration-none btn mt-4 w-75"><i
                             class="bi bi-bookmark-plus-fill"></i> Poser une question </a>
-                    <a href="poser_question.php"
+                    <a href="Mquestion.php"
                         class="col-md-auto col-sm-12 bg-primary p-2 rounded-3 text-light text-decoration-none btn mt-4 w-75">Mes
                         questions </a>
 

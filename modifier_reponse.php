@@ -11,7 +11,7 @@ if (isset($_POST["submit"])) {
     $reponse = $_POST["text"];
 
 
-      $requete = "UPDATE reponses SET contenu='$reponse' WHERE id_reponse=$reponse_id";
+      $requete = "UPDATE reponses SET contenu='$reponse'  WHERE id_reponse=$reponse_id";
       $query = mysqli_query($conn, $requete);
       header("Location: Question.php?id=$id");
   }
@@ -56,12 +56,6 @@ if (isset($_POST["submit"])) {
                                                 id="floatingTextarea"><?=$row['contenu']?></textarea>
                                             <label for="floatingTextarea">Votre reponse</label>
                                         </div>
-                                        <select id="tags" name="tags[]" class="form-control" multiple>
-                                            <!-- Options de tags existants -->
-                                            <option value="tag1">Tag 1</option>
-                                            <option value="tag2">Tag 2</option>
-                                            <!-- ... Ajoutez d'autres options de tags existants si nécessaire -->
-                                        </select>
 
 
                                         <div class="pt-1 mb-3 d-flex mt-2 justify-content-end">
@@ -80,17 +74,6 @@ if (isset($_POST["submit"])) {
         </div>
     </section>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-
-    <script>
-    $(document).ready(function() {
-        $('#tags').select2({
-            tags: true, // Permet aux utilisateurs d'ajouter de nouveaux tags
-            tokenSeparators: [',', ' '] // Délimiteurs de séparation entre les tags
-        });
-    });
-    </script>
 
 
 
