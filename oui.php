@@ -22,33 +22,6 @@ $user= $_SESSION['username'];
 
     <title>Document</title>
 
-    <script>
-    $(document).ready(function() {
-        $('#myInput').on('keyup', function() {
-            let inputValue = this.value;
-            let outputDiv = "#result"; // Utilisez le même ID que celui dans votre page pagination.php
-            console.log('inputValue ', inputValue);
-
-            if (inputValue != "") { // input received
-                $.ajax({
-                    url: "Rechercher_Questions.php",
-                    data: {
-                        'input': inputValue
-                    },
-                    dataType: "html",
-                    type: "POST",
-                    success: function(response) {
-                        $(outputDiv).empty().html(response);
-                    }
-                });
-            } else { // no input found
-                let msg = "Veuillez taper votre question ou le tag.";
-                $('.errMsg').text(msg);
-                $(outputDiv).empty(); // Vide la div des résultats en cas de champ de recherche vide
-            }
-        });
-    });
-    </script>
 
 
 </head>
@@ -97,44 +70,35 @@ $user= $_SESSION['username'];
 
         <div class="d-flex flex-lg-row justify-content-between flex-sm-column flex-md-column">
             <div class="d-flex justify-content-center mt-5 w-25 p-3 d-none d-lg-block ">
-                <div class="form-floating w-100">
-                    <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
-                        <option selected>All</option>
-                        <?php
-                                $queryProjets = mysqli_query($conn, "SELECT * FROM projets");
-                                while ($Projets = mysqli_fetch_assoc($queryProjets)) {
-                                 echo "<option value='{$Projets['nom_projet']}'>{$Projets['nom_projet']}</option>";
-                              }
-                               ?>
-                    </select>
-                    <label for="floatingSelect">Filtrer question par projet</label>
-                </div>
+                <a href="community.php"
+                    class="col-md-auto col-sm-12 bg-danger p-2 rounded-3 text-light text-decoration-none btn mt-1 w-100"><i
+                        class="bi bi-arrow-return-left"></i> Retour</a>
             </div>
             <div class="vr"></div>
             <div class="d-flex flex-column col w-auto w-md-75">
 
                 <div class="d-flex  flex-column align-items-center ">
-                    <h1 class="fw-lighter text-primary mt-3">Questions</h1>
                     <div class="d-flex justify-content-center mt-1 w-25 p-3 d-block d-lg-none w-75 ">
-                        <div class="form-floating w-100">
-                            <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
-                                <option selected>All</option>
-                                <option value="1">One</option>
-                                <option value="2">Two</option>
-                                <option value="3">Three</option>
-                            </select>
-                            <label for="floatingSelect">Filtrer question par projet</label>
-                        </div>
+                        <a href="community.php"
+                            class="col-md-auto col-sm-12 bg-danger p-2 rounded-3 text-light text-decoration-none btn mt-1 w-100"><i
+                                class="bi bi-arrow-return-left"></i> Retour</a>
+
                     </div>
+                    <h1 class="fw-lighter text-primary mt-3"> Mes Questions</h1>
+
                     <a href="poser_question.php"
                         class="col-md-auto col-sm-12 bg-primary p-2 rounded-3 text-light text-decoration-none btn mt-4 w-75"><i
                             class="bi bi-bookmark-plus-fill"></i> Poser une question </a>
-                    <a href="poser_question.php"
-                        class="col-md-auto col-sm-12 bg-primary p-2 rounded-3 text-light text-decoration-none btn mt-4 w-75">Mes
-                        questions </a>
 
 
-                    <div id="result" class="d-flex flex-column align-items-center w-100"></div>
+
+                    <div class="d-flex flex-column align-items-center w-100">
+                        <?php $sql = "SELECT * FROM questions INNER JOIN users ON questions.user_id = users.id_user";
+                        $fetch_query = mysqli_query($conn, $sql);
+                        
+                        ?>
+
+                    </div>
 
 
 
@@ -163,26 +127,3 @@ $user= $_SESSION['username'];
 </body>
 
 </html>
-<script type="text/javascript">
-$(document).ready(function() {
-    showdata();
-});
-
-function showdata(page) {
-    $.ajax({
-        url: 'pagination.php',
-        method: 'post',
-        data: {
-            page_no: page
-        },
-        success: function(result) {
-            $("#result").html(result);
-        }
-    });
-}
-
-$(document).on("click", ".pagination a", function() {
-    var page = $(this).attr('id');
-    showdata(page);
-});
-</script>

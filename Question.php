@@ -82,7 +82,7 @@ if (isset($_POST["submit"])) {
                 <a href="community.php"
                     class="col-md-auto col-sm-12 bg-danger p-2 rounded-3 text-light text-decoration-none btn mt-1 w-100"><i
                         class="bi bi-arrow-return-left"></i> Retour</a>
-                <a href="#"
+                <a href="poser_question.php"
                     class="col-md-auto col-sm-12 bg-primary p-2 rounded-3 text-light text-decoration-none btn mt-4 w-100"><i
                         class="bi bi-bookmark-plus-fill"></i> Poser une question</a>
             </div>
@@ -90,6 +90,12 @@ if (isset($_POST["submit"])) {
             <div class="d-flex flex-column col w-100 p-4">
 
                 <div class="d-flex  flex-column align-items-start  ">
+                    <a href="community.php"
+                        class="col-md-auto col-sm-12 bg-danger p-2 rounded-3 text-light text-decoration-none btn mt-1 d-block d-lg-none w-75"><i
+                            class="bi bi-arrow-return-left"></i> Retour</a>
+                    <a href="poser_question.php"
+                        class="col-md-auto col-sm-12 bg-primary p-2 rounded-3 text-light text-decoration-none btn mt-4 d-block d-lg-none w-75"><i
+                            class="bi bi-bookmark-plus-fill"></i> Poser une question</a>
                     <h2 class="fw-lighter text-primary mt-3">Questions</h2>
                     <h3 class="mt-3"><?php echo $row['titre']; ?></h3>
                     <div class="jumbotron bg w-75 ">
@@ -116,10 +122,13 @@ if(mysqli_num_rows($result) == 0){
     while ($row = mysqli_fetch_assoc($result)) {
         ?>
                     <div class="jumbotron bg w-75 mt-2">
-                        <div class="d-flex justify-content-end pt-2 px-3">
+                        <div class="d-flex justify-content-end pt-2 px-3 ">
                             <p> <span class="text-primary"><?php echo $row['date_creation']; ?></span></p>
                         </div>
-                        <p class="lead  px-2"><?php echo $row['contenu']; ?> </p>
+
+                        <p class="lead  px-2 " style="overflow-wrap: break-word; word-wrap: break-word;">
+                            <?php echo $row['contenu']; ?> </p>
+
                         <hr class="my-4">
                         <div class="d-flex justify-content-between px-2">
                             <p>Répondre par : <span
@@ -134,7 +143,7 @@ if(mysqli_num_rows($result) == 0){
                                     class="text-danger ms-4 text-center">
                                     <i class=" bi-trash3-fill"></i>
                                 </a>
-                                <a href="supprimer_reponse.php?id=<?php echo $row['id_reponse']; ?>"
+                                <a href="modifier_reponse.php?id=<?php echo $row['id_reponse']; ?>"
                                     class="text-primary ms-4 text-center">
                                     <i class=" bi bi-pencil"></i>
                                 </a>
@@ -160,7 +169,7 @@ if(mysqli_num_rows($result) == 0){
                         <div class="form-floating mt-3  ">
                             <textarea name="text" class="form-control bg h-80" placeholder="Leave a comment here"
                                 id="floatingTextarea"></textarea>
-                            <label for="floatingTextarea">Votre reponse</label>
+                            <label for=" floatingTextarea">Votre reponse</label>
                         </div>
                         <div class="d-flex justify-content-end">
                             <button type="submit" name="submit"
