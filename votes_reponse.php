@@ -1,8 +1,7 @@
 <?php
-// Connect to the database
 session_start();
 include "FrontEnd & Backend/connexion.php";
-$message = "";
+$message="";
 
 // Check if the user is logged in
 if (!isset($_SESSION['username'])) {
@@ -19,41 +18,40 @@ if (!$conn) {
     die("Error connecting to the database: " . mysqli_connect_error());
 }
 
-
-// If the user clicks like or dislike button for answers
+// If the user clicks like or dislike button
 if (isset($_POST['action'])) {
-    $answer_id = $_POST['answer_id'];  // Change to answer_id
+    $reponse_id = $_POST['reponse_id'];
     $action = $_POST['action'];
 
     switch ($action) {
-        case 'like_answer':
-            // Delete any existing dislike vote for the user on the same answer
-            $delete_dislike_sql = "DELETE FROM votes WHERE user_id=$user_id AND reponse_id=$answer_id AND type='dislike'";
+        case 'like':
+            // Delete any existing dislike vote for the user on the same reponse
+            $delete_dislike_sql = "DELETE FROM votes WHERE user_id=$user_id AND reponse_id=$reponse_id AND type='dislike'";
             mysqli_query($conn, $delete_dislike_sql);
 
             // Insert or update the like vote
-            $insert_like_sql = "INSERT INTO votes (user_id, reponse_id, type) VALUES ($user_id, $answer_id, 'like')
+            $insert_like_sql = "INSERT INTO votes (user_id, reponse_id, type) VALUES ($user_id, $reponse_id, 'like')
                                 ON DUPLICATE KEY UPDATE type='like'";
             mysqli_query($conn, $insert_like_sql);
             break;
-        case 'dislike_answer':
-            // Delete any existing like vote for the user on the same answer
-            $delete_like_sql = "DELETE FROM votes WHERE user_id=$user_id AND reponse_id=$answer_id AND type='like'";
+        case 'dislike':
+            // Delete any existing like vote for the user on the same reponse
+            $delete_like_sql = "DELETE FROM votes WHERE user_id=$user_id AND reponse_id=$reponse_id AND type='like'";
             mysqli_query($conn, $delete_like_sql);
 
             // Insert or update the dislike vote
-            $insert_dislike_sql = "INSERT INTO votes (user_id, reponse_id, type) VALUES ($user_id, $answer_id, 'dislike')
+            $insert_dislike_sql = "INSERT INTO votes (user_id, reponse_id, type) VALUES ($user_id, $reponse_id, 'dislike')
                                    ON DUPLICATE KEY UPDATE type='dislike'";
             mysqli_query($conn, $insert_dislike_sql);
             break;
-        case 'unlike_answer':
+        case 'unlike':
             // Delete the like vote
-            $delete_like_sql = "DELETE FROM votes WHERE user_id=$user_id AND reponse_id=$answer_id AND type='like'";
+            $delete_like_sql = "DELETE FROM votes WHERE user_id=$user_id AND reponse_id=$reponse_id AND type='like'";
             mysqli_query($conn, $delete_like_sql);
             break;
-        case 'undislike_answer':
+        case 'undislike':
             // Delete the dislike vote
-            $delete_dislike_sql = "DELETE FROM votes WHERE user_id=$user_id AND reponse_id=$answer_id AND type='dislike'";
+            $delete_dislike_sql = "DELETE FROM votes WHERE user_id=$user_id AND reponse_id=$reponse_id AND type='dislike'";
             mysqli_query($conn, $delete_dislike_sql);
             break;
         default:
@@ -61,12 +59,12 @@ if (isset($_POST['action'])) {
     }
 
     // Output the updated rating
-    echo getRatingForAnswer($answer_id);
+    echo getRating($reponse_id);
     exit(0);
 }
 
-// Get total number of likes for a particular answer
-function getLikesForAnswer($id)
+// Get total number of likes for a particular reponse
+function getLikes($id)
 {
     global $conn;
     $sql = "SELECT COUNT(*) FROM votes 
@@ -76,19 +74,8 @@ function getLikesForAnswer($id)
     return $likes[0];
 }
 
-// Check if the user already likes the answer or not
-function userLikedAnswer($answer_id)
-{
-    global $conn;
-    global $user_id;
-    $sql = "SELECT * FROM votes WHERE user_id=$user_id 
-            AND reponse_id=$answer_id AND type='like'";
-    $result = mysqli_query($conn, $sql);
-    return mysqli_num_rows($result) > 0;
-}
-
-// Get total number of dislikes for a particular answer
-function getDislikesForAnswer($id)
+// Get total number of dislikes for a particular reponse
+function getDislikes($id)
 {
     global $conn;
     $sql = "SELECT COUNT(*) FROM votes 
@@ -98,8 +85,8 @@ function getDislikesForAnswer($id)
     return $dislikes[0];
 }
 
-// Get total number of likes and dislikes for a particular answer
-function getRatingForAnswer($id)
+// Get total number of likes and dislikes for a particular reponse
+function getRating($id)
 {
     global $conn;
     $rating = array();
@@ -117,30 +104,30 @@ function getRatingForAnswer($id)
     return json_encode($rating);
 }
 
-// Check if the user already likes the answer or not
-function userLikedForAnswer($answer_id)
+// Check if the user already likes the reponse or not
+function userLiked($reponse_id)
 {
     global $conn;
     global $user_id;
     $sql = "SELECT * FROM votes WHERE user_id=$user_id 
-            AND reponse_id=$answer_id AND type='like'";
+            AND reponse_id=$reponse_id AND type='like'";
     $result = mysqli_query($conn, $sql);
     return mysqli_num_rows($result) > 0;
 }
 
-// Check if the user already dislikes the answer or not
-function userDislikedForAnswer($answer_id)
+// Check if the user already dislikes the reponse or not
+function userDisliked($reponse_id)
 {
     global $conn;
     global $user_id;
     $sql = "SELECT * FROM votes WHERE user_id=$user_id 
-            AND reponse_id=$answer_id AND type='dislike'";
+            AND reponse_id=$reponse_id AND type='dislike'";
     $result = mysqli_query($conn, $sql);
     return mysqli_num_rows($result) > 0;
 }
 
-// Fetch all answers from the database
+// Fetch all reponses from the database
 $sql = "SELECT * FROM reponses";
 $result = mysqli_query($conn, $sql);
-$answers = mysqli_fetch_all($result, MYSQLI_ASSOC);
+$reponses = mysqli_fetch_all($result, MYSQLI_ASSOC);
 ?>

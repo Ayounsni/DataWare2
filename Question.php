@@ -1,7 +1,5 @@
 <?php
-session_start();
-include "FrontEnd & Backend/connexion.php";
-$message="";
+include('votes_reponse.php');
 $question_id = $_GET['id'];
 $user= $_SESSION['username'];
 $sql = "SELECT * FROM questions INNER JOIN users ON questions.user_id  = users.id_user WHERE questions.id_question = $question_id ";
@@ -101,6 +99,7 @@ if (isset($_POST["submit"])) {
                             <p>Poser le : <span class="text-primary"><?php echo $row['date_creation']; ?></span></p>
                         </div>
                     </div>
+                <?php foreach ($reponses as $reponse): ?>
                     <h2 class="fw-lighter text-primary mt-3">Réponses</h2>
                     <?php
 
@@ -122,8 +121,14 @@ if (isset($_POST["submit"])) {
                                     class="text-danger"><?php echo $row['First_name']. ' ' . $row['Last_name'] ; ?></span>
                             </p>
                             <div class="d-flex justify-content-center gap-3">
-                                <p onclick="myFunction(this)" class="like"><i class="fa fa-thumbs-up"></i> 1</p>
-                                <p onclick="yourFunction(this)" class="dislike"><i class="fa fa-thumbs-down"></i> 1</p>
+                                <!-- Like and Dislike buttons -->
+                                <i <?php echo (userLiked($reponse['id_reponse'])) ? 'class="fa fa-thumbs-up like-btn"' : 'class="fa fa-thumbs-o-up like-btn"'; ?>
+                                    data-id="<?php echo $reponse['id_reponse']; ?>"></i>
+                                <span class="likes"><?php echo getLikes($reponse['id_reponse']); ?></span>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <i <?php echo (userDisliked($reponse['id_reponse'])) ? 'class="fa fa-thumbs-down dislike-btn"' : 'class="fa fa-thumbs-o-down dislike-btn"'; ?>
+                                    data-id="<?php echo $reponse['id_reponse']; ?>"></i>
+                                <span class="dislikes"><?php echo getDislikes($reponse['id_reponse']); ?></span>
                             </div>
                             <p>Répondre le : <span class="text-primary"><?php echo $row['date_creation']; ?></span></p>
                         </div>
@@ -133,7 +138,7 @@ if (isset($_POST["submit"])) {
                     } 
                     ?>
                     <p class="text-center fs-5 fw-bolder text-danger"><?php echo $message;?></p>
-
+                    <?php endforeach; ?>
 
 
                     <form method="post" action="" class="w-75 ">
@@ -154,13 +159,61 @@ if (isset($_POST["submit"])) {
         </div>
         
     <script>
-        function myFunction(x) {
-            x.classList.toggle("text-success");
-        }
+        $(document).ready(function () {
+    // if the user clicks on the like button ...
+    $('.like-btn').on('click', function () {
+        var reponse_id = $(this).data('id');
+        $clicked_btn = $(this);
 
-        function yourFunction(x) {
-            x.classList.toggle("text-danger");
-        }
+        // Check if the button is currently in the like state
+        var isLiked = $clicked_btn.hasClass('fa-thumbs-up');
+
+        $.ajax({
+            url: 'server.php',
+            type: 'post',
+            data: {
+                'action': isLiked ? 'unlike' : 'like',
+                'reponse_id': reponse_id
+            },
+            success: function (data) {
+                res = JSON.parse(data);
+                // Toggle classes based on the action performed
+                $clicked_btn.toggleClass('fa-thumbs-o-up fa-thumbs-up');
+                $clicked_btn.siblings('i.fa-thumbs-down').removeClass('fa-thumbs-down').addClass('fa-thumbs-o-down');
+                // Display the number of likes and dislikes
+                $clicked_btn.siblings('span.likes').text(res.likes);
+                $clicked_btn.siblings('span.dislikes').text(res.dislikes);
+            }
+        });
+    });
+
+    // if the user clicks on the dislike button ...
+    $('.dislike-btn').on('click', function () {
+        var reponse_id = $(this).data('id');
+        $clicked_btn = $(this);
+
+        // Check if the button is currently in the dislike state
+        var isDisliked = $clicked_btn.hasClass('fa-thumbs-down');
+
+        $.ajax({
+            url: 'server.php',
+            type: 'post',
+            data: {
+                'action': isDisliked ? 'undislike' : 'dislike',
+                'reponse_id': reponse_id
+            },
+            success: function (data) {
+                res = JSON.parse(data);
+                // Toggle classes based on the action performed
+                $clicked_btn.toggleClass('fa-thumbs-o-down fa-thumbs-down');
+                $clicked_btn.siblings('i.fa-thumbs-up').removeClass('fa-thumbs-up').addClass('fa-thumbs-o-up');
+                // Display the number of likes and dislikes
+                $clicked_btn.siblings('span.likes').text(res.likes);
+                $clicked_btn.siblings('span.dislikes').text(res.dislikes);
+            }
+        });
+    });
+});
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
