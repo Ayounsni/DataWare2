@@ -12,9 +12,11 @@ if (isset($_POST["submit"])){
   if($row == 1){
     $username=$fetch['Last_name'];
     $membre=$fetch['id_user'];
+    $rol=$fetch['role'];
     session_start();
     $_SESSION['username']=$username;
     $_SESSION['id']=$membre;
+    $_SESSION['role']=$rol;
     $_SESSION['autoriser']= "oui";
     if($fetch["role"]== "user"){
       header("Location: DashboardUser.php");

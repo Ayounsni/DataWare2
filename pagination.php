@@ -1,4 +1,6 @@
 <?php
+session_start();
+$role= $_SESSION['role'];
 include("./FrontEnd & Backend/connexion.php");
 $limit_page = 10;
 $page = isset($_POST['page_no']) ? $_POST['page_no'] : 1;
@@ -38,13 +40,19 @@ if ($row_count > 0) {
         }
 
         $output .= '</div>
-                    <div class="card-footer d-flex justify-content-end gap-3">
-                        <p><i class="bi bi-chat"></i> Répondre</p>
-                        <p onclick="myFunction(this)" class="like"><i class="fa fa-thumbs-up"></i> 1</p>
-                        <p onclick="yourFunction(this)" class="dislike"><i class="fa fa-thumbs-down"></i> 1</p>
-                    </div>
-                    </div>
-            </div>';
+        <div class="card-footer d-flex justify-content-end gap-3">';
+        // Check if the response belongs to the current user
+        if ($role == 'scrum_master') {
+            $output .= '<a href="#" class="text-success "><i class="bi bi-archive-fill"></i></a>';
+        }
+        $output .= '
+        <p><i class="bi bi-chat"></i> Répondre</p>
+        <p onclick="myFunction(this)" class="like"><i class="fa fa-thumbs-up"></i> 1</p>
+        <p onclick="yourFunction(this)" class="dislike"><i class="fa fa-thumbs-down"></i> 1</p>
+        </div>
+        </div>
+        </div>';
+        
     }
 
     $output .= '</div>';

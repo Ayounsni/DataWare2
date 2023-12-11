@@ -144,9 +144,11 @@ if ($result) {
                                     </div>
                                     <div class=" d-flex justify-content-end gap-3">
                                         <p><i class="bi bi-chat"></i> Répondre</p>
-                                        <p onclick="myFunction(this)" class="like"><i class="fa fa-thumbs-up"></i> 1</p>
+                                        <p onclick="myFunction(this)" class="like text-primary"><i
+                                                class="fa fa-thumbs-o-up"></i> 1
+                                        </p>
                                         <p onclick="yourFunction(this)" class="dislike"><i
-                                                class="fa fa-thumbs-down"></i> 1
+                                                class="fa fa-thumbs-o-down"></i> 1
                                         </p>
                                     </div>
                                 </div>

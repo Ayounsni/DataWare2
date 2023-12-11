@@ -5,6 +5,7 @@ $message="";
 $question_id = $_GET['id'];
 $_SESSION['question'] = $_GET['id'];
 $user= $_SESSION['username'];
+$role= $_SESSION['role'];
 $sql = "SELECT * FROM questions INNER JOIN users ON questions.user_id  = users.id_user WHERE questions.id_question = $question_id ";
 
 $result = mysqli_query($conn, $sql);
@@ -122,7 +123,17 @@ if(mysqli_num_rows($result) == 0){
     while ($row = mysqli_fetch_assoc($result)) {
         ?>
                     <div class="jumbotron bg w-75 mt-2">
-                        <div class="d-flex justify-content-end pt-2 px-3 ">
+                        <div class="d-flex justify-content-between pt-2 px-3 ">
+                            <?php
+                // Check if the response belongs to the current user
+                if ($role == 'scrum_master') {
+                    ?>
+
+                            <a href="#" class="text-success"><i class="bi bi-archive-fill"></i></a>
+                            <?php
+                }
+                ?>
+
                             <p> <span class="text-primary"><?php echo $row['date_creation']; ?></span></p>
                         </div>
 
