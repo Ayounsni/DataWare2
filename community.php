@@ -30,8 +30,8 @@ $user= $_SESSION['username'];
 
                 <img src="Image/log.png" alt="logo" class="rounded-4" style="width: 80px; height: 60px;">
                 <div class="input-group w-50 ms-md-4 ">
-                    <input type="search" class="form-control rounded" placeholder="Search" aria-label="Search"
-                        aria-describedby="search-addon" />
+                    <input type="search" id="myInput" class="form-control rounded" placeholder="Search"
+                        aria-label="Search" aria-describedby="search-addon" />
                     <button type="button" class="btn btn-outline-primary" data-mdb-ripple-init><i
                             class="bi bi-search"></i></button>
                 </div>
@@ -68,12 +68,23 @@ $user= $_SESSION['username'];
         <div class="d-flex flex-lg-row justify-content-between flex-sm-column flex-md-column">
             <div class="d-flex justify-content-center mt-5 w-25 p-3 d-none d-lg-block ">
                 <div class="form-floating w-100">
-                    <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
-                        <option selected>All</option>
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Three</option>
-                    </select>
+                <select class="form-control" onchange="selectdata(this.options[this.selectedIndex].value)">
+                <option value="All">All</option>
+                <?php
+                // Include your database connection
+                include "FrontEnd & Backend/connexion.php";;
+
+                // Query to get distinct categories
+                $query = "SELECT DISTINCT nom_projet FROM projets";
+                $result = mysqli_query($conn, $query);
+
+                // Display options
+                while ($row = mysqli_fetch_assoc($result)) {
+                    $category = $row['nom_projet'];
+                    echo "<option value='$category'>$category</option>";
+                }
+                ?>
+            </select>
                     <label for="floatingSelect">Filtrer question par projet</label>
                 </div>
             </div>
@@ -97,7 +108,7 @@ $user= $_SESSION['username'];
                         class="col-md-auto col-sm-12 bg-primary p-2 rounded-3 text-light text-decoration-none btn mt-4 w-75"><i
                             class="bi bi-bookmark-plus-fill"></i> Poser une question </a>
 
-                            
+                             
     <div id="result"  class="d-flex flex-column align-items-center w-100"></div> 
 
 
@@ -135,7 +146,7 @@ $user= $_SESSION['username'];
 
     function showdata(page) {
         $.ajax({
-            url: 'pagination.php',
+            url: 'show-data.php',
             method: 'post',
             data: {page_no: page},
             success: function (result) {
@@ -148,4 +159,41 @@ $user= $_SESSION['username'];
         var page = $(this).attr('id');
         showdata(page);
     });
+
+    function selectdata(cat) {
+        $.ajax({
+            url: 'show-data.php',
+            method: 'post',
+            data: 'cat_name=' + cat,
+            success: function (result) {
+                $("#result").html(result);
+            }
+        });
+    }
+    $(document).ready(function () {
+                $('#myInput').on('keyup', function () {
+                    let inputValue = this.value;
+                    let outputDiv = "#result";
+                    console.log('inputValue ', inputValue);
+
+                    if (inputValue != "") {
+                        $.ajax({
+                            url: "Rechercher_Questions.php",
+                            data: {
+                                'input': inputValue
+                            },
+                            dataType: "html",
+                            type: "POST",
+                            success: function (response) {
+                                $(outputDiv).empty().html(response);
+                            }
+                        });
+                    } else {
+                        let msg = "Veuillez taper votre question ou le tag.";
+                        $('.errMsg').text(msg);
+                        $(outputDiv).empty();
+                    }
+                });
+            });
 </script>
+

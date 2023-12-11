@@ -54,7 +54,7 @@ if ($row_count > 0) {
             </div>';
     }
 
-    // Calculate total pages
+    // Recalculate total pages after filtering
     $fetch_query_all = mysqli_query($conn, "SELECT * FROM questions INNER JOIN projets ON questions.projet_id = projets.id_projets WHERE ('$catname' = 'All' OR projets.nom_projet = '$catname')");
     $total_row = mysqli_num_rows($fetch_query_all);
     $total_page = ceil($total_row / $limit_page);
