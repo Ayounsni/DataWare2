@@ -104,10 +104,15 @@ $user= $_SESSION['username'];
                             <label for="floatingSelect">Filtrer question par projet</label>
                         </div>
                     </div>
-                    <a href="#"
+                    <a href="poser_question.php"
                         class="col-md-auto col-sm-12 bg-primary p-2 rounded-3 text-light text-decoration-none btn mt-4 w-75"><i
                             class="bi bi-bookmark-plus-fill"></i> Poser une question </a>
+                    <a href="Mquestion.php"
+                        class="col-md-auto col-sm-12 bg-primary p-2 rounded-3 text-light text-decoration-none btn mt-4 w-75">Mes
+                        questions </a>
 
+
+                    <div id="result" class="d-flex flex-column align-items-center w-100"></div>
                              
     <div id="result"  class="d-flex flex-column align-items-center w-100"></div> 
 
