@@ -1,6 +1,6 @@
 <?php
 session_start();
-include "FrontEnd & Backend/connexion.php";
+include "connexion.php";
 $message="";
 $question_id = $_GET['id'];
 $_SESSION['question'] = $_GET['id'];
@@ -30,7 +30,7 @@ if (isset($_POST["submit"])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="FrontEnd & Backend/style.css" type="text/css">
+    <link rel="stylesheet" href="style.css" type="text/css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
     <title>Document</title>
@@ -41,8 +41,8 @@ if (isset($_POST["submit"])) {
         <nav class="navbar navbar-expand-lg navbar-scroll  shadow-0 border-bottom border-dark">
             <div class="container">
 
-                <img src="Image/log.png" alt="logo" class="rounded-4" style="width: 80px; height: 60px;">
-                <div class="input-group w-50 ms-md-4 ">
+                <img src="../Image/log.png" alt="logo" class="rounded-4" style="width: 80px; height: 60px;">
+                <div class="input-group  ms-md-4 ">
                     <input type="search" class="form-control rounded" placeholder="Search" aria-label="Search"
                         aria-describedby="search-addon" />
                     <button type="button" class="btn btn-outline-primary" data-mdb-ripple-init><i
@@ -58,6 +58,32 @@ if (isset($_POST["submit"])) {
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
 
                     <ul class="navbar-nav ms-auto d-flex gap-5">
+                        <?php
+    if($role == "user") {
+        ?>
+                        <li class="nav-item">
+                            <a class="nav-link text-center" href="community.php.php">Community</a>
+                        </li>
+
+                        <li class="nav-item w-1">
+                            <a class="nav-link text-center" href="Gestionequi.php">Equipes</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-center" href="Assignation.php">Projets</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="deconnexion.php"
+                                class="btn bg-danger p-2 rounded-3 text-light text-decoration-none d-flex gap-1 ">
+                                <i class="bi bi-box-arrow-left"> </i>
+                                <p class="m-0"> Deconnexion </p>
+                            </a>
+                        </li>
+                        <?php
+    } elseif($role == "scrum_master") {
+        ?>
+                        <li class="nav-item">
+                            <a class="nav-link text-center" href="DashboardScrum.php">Community</a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link text-center" href="DashboardScrum.php">Equipes</a>
                         </li>
@@ -67,10 +93,42 @@ if (isset($_POST["submit"])) {
                         <li class="nav-item">
                             <a class="nav-link text-center" href="Assignation.php">Assignation</a>
                         </li>
-                        <a href="deconnexion.php"
-                            class="btn bg-danger p-2 rounded-3 text-light text-decoration-none "><i
-                                class="bi bi-box-arrow-left"></i> Deconnexion</a>
+                        <li class="nav-item">
+                            <a href="deconnexion.php"
+                                class="btn bg-danger p-2 rounded-3 text-light text-decoration-none d-flex gap-1 ">
+                                <i class="bi bi-box-arrow-left"> </i>
+                                <p class="m-0"> Deconnexion </p>
+                            </a>
+                        </li>
+
+                        <?php
+    } else {
+        ?>
+                        <li class="nav-item">
+                            <a class="nav-link text-center" href="DashboardScrum.php">Community</a>
+                        </li>
+                        <li class="nav-item text-center">
+                            <a class="nav-link" href="DashboardM.php">Projets</a>
+                        </li>
+                        <li class="nav-item text-center">
+                            <a class="nav-link" href="MembreP.php">Membres</a>
+                        </li>
+                        <li class="nav-item text-center">
+                            <a class="nav-link" href="assigner.php">Assignation</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="deconnexion.php"
+                                class="btn bg-danger p-2 rounded-3 text-light text-decoration-none d-flex gap-1 ">
+                                <i class="bi bi-box-arrow-left"> </i>
+                                <p class="m-0"> Deconnexion </p>
+                            </a>
+                        </li>
+                        <?php
+    }
+    ?>
+
                     </ul>
+
 
                 </div>
             </div>
