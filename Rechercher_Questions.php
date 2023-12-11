@@ -3,6 +3,7 @@ include "FrontEnd & Backend/connexion.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['input'])) {
     $inputValues = $_POST['input'];
+  
 
     $sql_query = "SELECT * FROM questions 
                   INNER JOIN users ON questions.user_id = users.id_user
@@ -13,6 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['input'])) {
                     OR tags.nom_tag LIKE '%$inputValues%'
                   GROUP BY questions.id_question
                   ORDER BY questions.date_creation DESC";
+                  
 
     $result = mysqli_query($conn, $sql_query);
 
@@ -60,4 +62,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['input'])) {
     echo $output;
 }
 ?>
-

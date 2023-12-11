@@ -23,8 +23,8 @@ $user= $_SESSION['username'];
     <title>Document</title>
 
     <script>
-    $(document).ready(function () {
-        $('#myInput').on('keyup', function () {
+    $(document).ready(function() {
+        $('#myInput').on('keyup', function() {
             let inputValue = this.value;
             let outputDiv = "#result"; // Utilisez le même ID que celui dans votre page pagination.php
             console.log('inputValue ', inputValue);
@@ -32,10 +32,12 @@ $user= $_SESSION['username'];
             if (inputValue != "") { // input received
                 $.ajax({
                     url: "Rechercher_Questions.php",
-                    data: {'input': inputValue},
+                    data: {
+                        'input': inputValue
+                    },
                     dataType: "html",
                     type: "POST",
-                    success: function (response) {
+                    success: function(response) {
                         $(outputDiv).empty().html(response);
                     }
                 });
@@ -46,7 +48,7 @@ $user= $_SESSION['username'];
             }
         });
     });
-</script>
+    </script>
 
 
 </head>
@@ -58,8 +60,8 @@ $user= $_SESSION['username'];
 
                 <img src="Image/log.png" alt="logo" class="rounded-4" style="width: 80px; height: 60px;">
                 <div class="input-group w-50 ms-md-4 ">
-                    <input type="search" id="myInput" class="form-control rounded" placeholder="Search" aria-label="Search"
-                        aria-describedby="search-addon" />
+                    <input type="search" id="myInput" class="form-control rounded" placeholder="Search"
+                        aria-label="Search" aria-describedby="search-addon" />
                     <button type="button" class="btn btn-outline-primary" data-mdb-ripple-init><i
                             class="bi bi-search"></i></button>
                 </div>
@@ -98,9 +100,12 @@ $user= $_SESSION['username'];
                 <div class="form-floating w-100">
                     <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
                         <option selected>All</option>
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Three</option>
+                        <?php
+                                $queryProjets = mysqli_query($conn, "SELECT * FROM projets");
+                                while ($Projets = mysqli_fetch_assoc($queryProjets)) {
+                                 echo "<option value='{$Projets['nom_projet']}'>{$Projets['nom_projet']}</option>";
+                              }
+                               ?>
                     </select>
                     <label for="floatingSelect">Filtrer question par projet</label>
                 </div>
@@ -121,17 +126,19 @@ $user= $_SESSION['username'];
                             <label for="floatingSelect">Filtrer question par projet</label>
                         </div>
                     </div>
-                    <a href="#"
+                    <a href="poser_question.php"
                         class="col-md-auto col-sm-12 bg-primary p-2 rounded-3 text-light text-decoration-none btn mt-4 w-75"><i
                             class="bi bi-bookmark-plus-fill"></i> Poser une question </a>
+                    <a href="Mquestion.php"
+                        class="col-md-auto col-sm-12 bg-primary p-2 rounded-3 text-light text-decoration-none btn mt-4 w-75">Mes
+                        questions </a>
 
-                            
-    <div id="result"  class="d-flex flex-column align-items-center w-100"></div> 
+
+                    <div id="result" class="d-flex flex-column align-items-center w-100"></div>
 
 
 
                 </div>
-              
 
             </div>
 
@@ -157,23 +164,25 @@ $user= $_SESSION['username'];
 
 </html>
 <script type="text/javascript">
-    $(document).ready(function () {
-        showdata();
-    });
+$(document).ready(function() {
+    showdata();
+});
 
-    function showdata(page) {
-        $.ajax({
-            url: 'pagination.php',
-            method: 'post',
-            data: {page_no: page},
-            success: function (result) {
-                $("#result").html(result);
-            }
-        });
-    }
-
-    $(document).on("click", ".pagination a", function () {
-        var page = $(this).attr('id');
-        showdata(page);
+function showdata(page) {
+    $.ajax({
+        url: 'pagination.php',
+        method: 'post',
+        data: {
+            page_no: page
+        },
+        success: function(result) {
+            $("#result").html(result);
+        }
     });
+}
+
+$(document).on("click", ".pagination a", function() {
+    var page = $(this).attr('id');
+    showdata(page);
+});
 </script>
