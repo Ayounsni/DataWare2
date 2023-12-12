@@ -50,6 +50,9 @@ $user= $_SESSION['username'];
                         <li class="nav-item text-center">
                             <a class="nav-link" href="assigner.php">Assignation</a>
                         </li>
+                        <li class="nav-item text-center">
+                            <a class="nav-link" href="pr.php">Statistique</a>
+                        </li>
 
                         <a href="deconnexion.php"
                             class="btn bg-danger p-2 rounded-3 text-light text-decoration-none "><i

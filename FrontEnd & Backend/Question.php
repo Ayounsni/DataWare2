@@ -111,6 +111,9 @@ if (isset($_POST["submit"])) {
                         <li class="nav-item text-center">
                             <a class="nav-link" href="assigner.php">Assignation</a>
                         </li>
+                        <li class="nav-item text-center">
+                            <a class="nav-link" href="pr.php">Statistique</a>
+                        </li>
                         <li class="nav-item">
                             <a href="deconnexion.php"
                                 class="btn bg-danger p-2 rounded-3 text-light text-decoration-none d-flex gap-1 ">
@@ -208,8 +211,6 @@ if (mysqli_num_rows($result) == 0) {
                     }
                 }
                 ?>
-
-
 
                             <p class="text-center"> <span
                                     class="text-primary text-center"><?php echo $row['date_creation']; ?></span></p>

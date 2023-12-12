@@ -46,7 +46,7 @@ $user= $_SESSION['username'];
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
 
                     <ul class="navbar-nav ms-auto d-flex gap-5">
-                    <?php
+                        <?php
     if($role == "user") {
         ?>
                         <li class="nav-item">
@@ -104,6 +104,9 @@ $user= $_SESSION['username'];
                         <li class="nav-item text-center">
                             <a class="nav-link" href="assigner.php">Assignation</a>
                         </li>
+                        <li class="nav-item text-center">
+                            <a class="nav-link" href="pr.php">Statistique</a>
+                        </li>
                         <li class="nav-item">
                             <a href="deconnexion.php"
                                 class="btn bg-danger p-2 rounded-3 text-light text-decoration-none d-flex gap-1 ">
@@ -125,9 +128,9 @@ $user= $_SESSION['username'];
         <div class="d-flex flex-lg-row justify-content-between flex-sm-column flex-md-column">
             <div class="d-flex justify-content-center mt-5 w-25 p-3 d-none d-lg-block ">
                 <div class="form-floating w-100">
-                <select class="form-control" onchange="selectdata(this.options[this.selectedIndex].value)">
-                <option value="All">All</option>
-                <?php
+                    <select class="form-control" onchange="selectdata(this.options[this.selectedIndex].value)">
+                        <option value="All">All</option>
+                        <?php
                 // Include your database connection
                 include "FrontEnd & Backend/connexion.php";;
 
@@ -141,7 +144,7 @@ $user= $_SESSION['username'];
                     echo "<option value='$category'>$category</option>";
                 }
                 ?>
-            </select>
+                    </select>
                     <label for="floatingSelect">Filtrer question par projet</label>
                 </div>
             </div>
@@ -170,13 +173,13 @@ $user= $_SESSION['username'];
 
 
                     <div id="result" class="d-flex flex-column align-items-center w-100"></div>
-                             
-    <div id="result"  class="d-flex flex-column align-items-center w-100"></div> 
+
+                    <div id="result" class="d-flex flex-column align-items-center w-100"></div>
 
 
 
                 </div>
-              
+
 
             </div>
 
@@ -202,60 +205,61 @@ $user= $_SESSION['username'];
 
 </html>
 <script type="text/javascript">
-    $(document).ready(function () {
-        showdata();
+$(document).ready(function() {
+    showdata();
+});
+
+function showdata(page) {
+    $.ajax({
+        url: 'show-data.php',
+        method: 'post',
+        data: {
+            page_no: page
+        },
+        success: function(result) {
+            $("#result").html(result);
+        }
     });
+}
 
-    function showdata(page) {
-        $.ajax({
-            url: 'show-data.php',
-            method: 'post',
-            data: {page_no: page},
-            success: function (result) {
-                $("#result").html(result);
-            }
-        });
-    }
+$(document).on("click", ".pagination a", function() {
+    var page = $(this).attr('id');
+    showdata(page);
+});
 
-    $(document).on("click", ".pagination a", function () {
-        var page = $(this).attr('id');
-        showdata(page);
+function selectdata(cat) {
+    $.ajax({
+        url: 'show-data.php',
+        method: 'post',
+        data: 'cat_name=' + cat,
+        success: function(result) {
+            $("#result").html(result);
+        }
     });
+}
+$(document).ready(function() {
+    $('#myInput').on('keyup', function() {
+        let inputValue = this.value;
+        let outputDiv = "#result";
+        console.log('inputValue ', inputValue);
 
-    function selectdata(cat) {
-        $.ajax({
-            url: 'show-data.php',
-            method: 'post',
-            data: 'cat_name=' + cat,
-            success: function (result) {
-                $("#result").html(result);
-            }
-        });
-    }
-    $(document).ready(function () {
-                $('#myInput').on('keyup', function () {
-                    let inputValue = this.value;
-                    let outputDiv = "#result";
-                    console.log('inputValue ', inputValue);
-
-                    if (inputValue != "") {
-                        $.ajax({
-                            url: "Rechercher_Questions.php",
-                            data: {
-                                'input': inputValue
-                            },
-                            dataType: "html",
-                            type: "POST",
-                            success: function (response) {
-                                $(outputDiv).empty().html(response);
-                            }
-                        });
-                    } else {
-                        let msg = "Veuillez taper votre question ou le tag.";
-                        $('.errMsg').text(msg);
-                        $(outputDiv).empty();
-                    }
-                });
+        if (inputValue != "") {
+            $.ajax({
+                url: "Rechercher_Questions.php",
+                data: {
+                    'input': inputValue
+                },
+                dataType: "html",
+                type: "POST",
+                success: function(response) {
+                    $(outputDiv).empty().html(response);
+                }
             });
+        } else {
+            let msg = "Veuillez taper votre question ou le tag.";
+            $('.errMsg').text(msg);
+            $(outputDiv).empty();
+        }
+    });
+});
 </script>
-
