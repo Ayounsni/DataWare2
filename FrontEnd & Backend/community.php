@@ -257,5 +257,63 @@ $user= $_SESSION['username'];
                     }
                 });
             });
-</script>
+
+            $(document).ready(function () {
+    // if the user clicks on the like button ...
+    $(document).on('click', '.like-btn', function () {
+        var question_id = $(this).data('id');
+        $clicked_btn = $(this);
+
+        // Check if the button is currently in the like state
+        var isLiked = $clicked_btn.hasClass('text-success');
+
+        $.ajax({
+            url: 'show-data.php',
+            type: 'post',
+            data: {
+                'action': isLiked ? 'unlike' : 'like',
+                'question_id': question_id
+            },
+            success: function (data) {
+                res = JSON.parse(data);
+                // Toggle classes based on the action performed
+                $clicked_btn.toggleClass('text-success');
+                // Display the number of likes and dislikes
+                $clicked_btn.siblings('span.likes').text(res.likes);
+                $clicked_btn.siblings('i.dislike-btn').removeClass('text-danger');
+                $clicked_btn.siblings('span.dislikes').text(res.dislikes);
+            }
+        });
+    });
+
+    // if the user clicks on the dislike button ...
+    $(document).on('click', '.dislike-btn', function () {
+        var question_id = $(this).data('id');
+        $clicked_btn = $(this);
+
+        // Check if the button is currently in the dislike state
+        var isDisliked = $clicked_btn.hasClass('text-danger');
+
+        $.ajax({
+            url: 'show-data.php',
+            type: 'post',
+            data: {
+                'action': isDisliked ? 'undislike' : 'dislike',
+                'question_id': question_id
+            },
+            success: function (data) {
+                res = JSON.parse(data);
+                // Toggle classes based on the action performed
+                $clicked_btn.toggleClass('text-danger');
+                $clicked_btn.siblings('i.like-btn').removeClass('text-success');
+                // Display the number of likes and dislikes
+                $clicked_btn.siblings('span.likes').text(res.likes);
+                $clicked_btn.siblings('span.dislikes').text(res.dislikes);
+            }
+        });
+    });
+});
+
+
+    </script>
 
