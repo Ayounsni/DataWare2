@@ -1,23 +1,21 @@
 <?php
 session_start();
-$role= $_SESSION['role'];
-include("./FrontEnd & Backend/connexion.php");
+$role = $_SESSION['role'];
+include("connexion.php");
+
 $limit_page = 10;
 $page = isset($_POST['page_no']) ? $_POST['page_no'] : 1;
-
 $offset = ($page - 1) * $limit_page;
-$sql = "SELECT * FROM questions INNER JOIN users ON questions.user_id = users.id_user ORDER BY questions.date_creation DESC LIMIT $offset, $limit_page";
+$sql = "SELECT * FROM questions INNER JOIN users ON questions.user_id = users.id_user WHERE questions.archivee = 0  ORDER BY questions.date_creation DESC LIMIT $offset, $limit_page";
 
 $fetch_query = mysqli_query($conn, $sql);
-
-$output = "";
 $row_count = mysqli_num_rows($fetch_query);
 
 if ($row_count > 0) {
-    $output .= '';
+    $output = "";
 
     while ($row = mysqli_fetch_assoc($fetch_query)) {
-        $output .= '   <div  class="card w-75 mt-4">
+        $output .= '<div class="card w-75 mt-4">
             <div class="card-header d-flex justify-content-between text-danger">
                 <p>' . $row['First_name'] . ' ' . $row['Last_name'] . '</p>
                 <p>' . $row['date_creation'] . '</p>
@@ -27,24 +25,26 @@ if ($row_count > 0) {
                     <h3>' . $row['titre'] . '</h3>
                 </a>
                 <div class="d-flex gap-2 mt-2">';
-        
-        // Afficher les balises des tags
+    
+        // Display tags
         $question_id = $row['id_question'];
         $sqle = "SELECT * FROM questions 
                  JOIN question_tags ON questions.id_question = question_tags.question_id
                  JOIN tags  ON question_tags.tag_id = tags.id_tag WHERE questions.id_question = $question_id";
-
+    
         $resulte = mysqli_query($conn, $sqle);
         while ($tag_row = mysqli_fetch_assoc($resulte)) {
             $output .= '<p class="btn btn-outline-primary">' . $tag_row['nom_tag'] . '</p>';
         }
-
+    
         $output .= '</div>
         <div class="card-footer d-flex justify-content-end gap-3">';
-        // Check if the response belongs to the current user
+        
         if ($role == 'scrum_master') {
-            $output .= '<a href="Archiver_Question.php" class="text-success "><i class="bi bi-archive-fill"></i></a>';
+            $archiveLink = 'archiver_questions.php?question_id=' . $row['id_question'];
+            $output .= '<a href="' . $archiveLink . '" class="text-success"><i class="bi bi-archive-fill"></i></a>';
         }
+        
         $output .= '
         <p><i class="bi bi-chat"></i> Répondre</p>
         <p onclick="myFunction(this)" class="like"><i class="fa fa-thumbs-up"></i> 1</p>
@@ -52,7 +52,6 @@ if ($row_count > 0) {
         </div>
         </div>
         </div>';
-        
     }
 
     $output .= '</div>';
@@ -67,6 +66,7 @@ if ($row_count > 0) {
         $output .= "<li class='page-item  {$active}'><a class='page-link ' id='{$i}'>{$i}</a></li>";
     }
     $output .= '</ul>';
+
     echo $output;
 } else {
     echo "Aucun résultat trouvé.";

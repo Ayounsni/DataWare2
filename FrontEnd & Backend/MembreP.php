@@ -36,7 +36,10 @@ $user= $_SESSION['username'];
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ms-auto d-flex gap-5">
                         <li class="nav-item text-center">
-                            <a class="nav-link" href="DashboardM.php">Projets</a>
+                        <li class="nav-item text-center">
+                            <a class="nav-link" href="community.php">Community</a>
+                        </li>
+                        <a class="nav-link" href="DashboardM.php">Projets</a>
                         </li>
                         <li class="nav-item text-center">
                             <a class="nav-link" href="MembreP.php">Membres</a>

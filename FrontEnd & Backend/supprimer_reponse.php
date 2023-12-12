@@ -1,6 +1,6 @@
 <?php
 session_start();
-include "FrontEnd & Backend/connexion.php";
+include "connexion.php";
 $id=$_SESSION['question'];
 
 $reponse_id = $_GET['id'];

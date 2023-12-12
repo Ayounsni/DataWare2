@@ -1,5 +1,5 @@
 <?php
-include "FrontEnd & Backend/connexion.php";
+include "connexion.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['input'])) {
     $inputValues = $_POST['input'];

@@ -1,25 +1,39 @@
 <?php
 session_start();
-include "FrontEnd & Backend/connexion.php";
-$message="";
-$question_id = $_GET['id'];
-$_SESSION['question'] = $_GET['id'];
-$user= $_SESSION['username'];
-$role= $_SESSION['role'];
-$sql = "SELECT * FROM questions INNER JOIN users ON questions.user_id  = users.id_user WHERE questions.id_question = $question_id ";
+include "connexion.php";
+$message = "";
+$question_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
-$result = mysqli_query($conn, $sql);
-$row = mysqli_fetch_assoc($result);
-$membre= $_SESSION['id'];
+if (!$question_id) {
+    echo "ID de question non valide.";
+    exit;
+} else {
+    $_SESSION['question'] = $question_id;
+    $user = $_SESSION['username'] ?? null;
+    $role = $_SESSION['role'] ?? null;
 
-if (isset($_POST["submit"])) {
-    $text = $_POST["text"];
-    
-    $requete = "INSERT INTO reponses (user_id , question_id, contenu) VALUES ('$membre', '$question_id', '$text')";
-      $query = mysqli_query($conn, $requete);
-      header("Location: Question.php?id=$question_id");
-  }
+    $sql = "SELECT * FROM questions INNER JOIN users ON questions.user_id = users.id_user WHERE questions.id_question = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $question_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
+    $row = $result->fetch_assoc();
+
+    $membre = $_SESSION['id'] ?? null;
+
+    if (isset($_POST["submit"])) {
+        $text = htmlspecialchars($_POST["text"]);
+
+        $requete = "INSERT INTO reponses (user_id, question_id, contenu) VALUES (?, ?, ?)";
+        $query = $conn->prepare($requete);
+        $query->bind_param("iss", $membre, $question_id, $text);
+        $query->execute();
+
+        header("Location: Question.php?id=$question_id");
+        exit();
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -30,7 +44,7 @@ if (isset($_POST["submit"])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="FrontEnd & Backend/style.css" type="text/css">
+    <link rel="stylesheet" href="style.css" type="text/css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
     <title>Document</title>
@@ -41,8 +55,8 @@ if (isset($_POST["submit"])) {
         <nav class="navbar navbar-expand-lg navbar-scroll  shadow-0 border-bottom border-dark">
             <div class="container">
 
-                <img src="Image/log.png" alt="logo" class="rounded-4" style="width: 80px; height: 60px;">
-                <div class="input-group w-50 ms-md-4 ">
+                <img src="../Image/log.png" alt="logo" class="rounded-4" style="width: 80px; height: 60px;">
+                <div class="input-group  ms-md-4 ">
                     <input type="search" class="form-control rounded" placeholder="Search" aria-label="Search"
                         aria-describedby="search-addon" />
                     <button type="button" class="btn btn-outline-primary" data-mdb-ripple-init><i
@@ -58,6 +72,32 @@ if (isset($_POST["submit"])) {
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
 
                     <ul class="navbar-nav ms-auto d-flex gap-5">
+                        <?php
+    if($role == "user") {
+        ?>
+                        <li class="nav-item">
+                            <a class="nav-link text-center" href="community.php">Community</a>
+                        </li>
+
+                        <li class="nav-item w-1">
+                            <a class="nav-link text-center" href="Gestionequi.php">Equipes</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-center" href="Assignation.php">Projets</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="deconnexion.php"
+                                class="btn bg-danger p-2 rounded-3 text-light text-decoration-none d-flex gap-1 ">
+                                <i class="bi bi-box-arrow-left"> </i>
+                                <p class="m-0"> Deconnexion </p>
+                            </a>
+                        </li>
+                        <?php
+    } elseif($role == "scrum_master") {
+        ?>
+                        <li class="nav-item">
+                            <a class="nav-link text-center" href="DashboardScrum.php">Community</a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link text-center" href="DashboardScrum.php">Equipes</a>
                         </li>
@@ -67,10 +107,42 @@ if (isset($_POST["submit"])) {
                         <li class="nav-item">
                             <a class="nav-link text-center" href="Assignation.php">Assignation</a>
                         </li>
-                        <a href="deconnexion.php"
-                            class="btn bg-danger p-2 rounded-3 text-light text-decoration-none "><i
-                                class="bi bi-box-arrow-left"></i> Deconnexion</a>
+                        <li class="nav-item">
+                            <a href="deconnexion.php"
+                                class="btn bg-danger p-2 rounded-3 text-light text-decoration-none d-flex gap-1 ">
+                                <i class="bi bi-box-arrow-left"> </i>
+                                <p class="m-0"> Deconnexion </p>
+                            </a>
+                        </li>
+
+                        <?php
+    } else {
+        ?>
+                        <li class="nav-item">
+                            <a class="nav-link text-center" href="DashboardScrum.php">Community</a>
+                        </li>
+                        <li class="nav-item text-center">
+                            <a class="nav-link" href="DashboardM.php">Projets</a>
+                        </li>
+                        <li class="nav-item text-center">
+                            <a class="nav-link" href="MembreP.php">Membres</a>
+                        </li>
+                        <li class="nav-item text-center">
+                            <a class="nav-link" href="assigner.php">Assignation</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="deconnexion.php"
+                                class="btn bg-danger p-2 rounded-3 text-light text-decoration-none d-flex gap-1 ">
+                                <i class="bi bi-box-arrow-left"> </i>
+                                <p class="m-0"> Deconnexion </p>
+                            </a>
+                        </li>
+                        <?php
+    }
+    ?>
+
                     </ul>
+
 
                 </div>
             </div>
@@ -112,7 +184,7 @@ if (isset($_POST["submit"])) {
                     <h2 class="fw-lighter text-primary mt-3">Réponses</h2>
                     <?php
 
-$sql = "SELECT * FROM reponses INNER JOIN users ON reponses.user_id  = users.id_user WHERE reponses.question_id = $question_id ";
+$sql = "SELECT * FROM reponses INNER JOIN users ON reponses.user_id  = users.id_user WHERE reponses.question_id = $question_id AND reponses.archivee = 0";
 
 $result = mysqli_query($conn, $sql);
 
@@ -129,7 +201,7 @@ if(mysqli_num_rows($result) == 0){
                 if ($role == 'scrum_master') {
                     ?>
 
-                            <a href="#" class="text-success"><i class="bi bi-archive-fill"></i></a>
+<a href="archiver_reponses.php?reponse_id=<?php echo $row['id_reponse']; ?>" class="text-success"><i class="bi bi-archive-fill"></i></a>
                             <?php
                 }
                 ?>
