@@ -339,6 +339,18 @@ ALTER TABLE `votes`
   ADD CONSTRAINT `votes_ibfk_3` FOREIGN KEY (`reponse_id`) REFERENCES `reponses` (`id_reponse`);
 COMMIT;
 
+--
+-- adds a column named is_solution to the reponses table
+--
+
+ALTER TABLE `reponses`
+ADD COLUMN `is_solution` TINYINT(1) NOT NULL DEFAULT 0;
+
+-- Add an index on the new column
+ALTER TABLE `reponses`
+ADD INDEX `idx_is_solution` (`is_solution`);
+
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

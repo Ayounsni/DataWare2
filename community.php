@@ -105,7 +105,7 @@ $questions = mysqli_fetch_all($result, MYSQLI_ASSOC);
                             <p><?php echo $question['date_creation']; ?></p>
                         </div>
                         <div class="card-body d-flex flex-column">
-                            <a href="Question.php?id=<?= $question['id_question'] ?>" class="text-decoration-none text-dark">
+                        <a href="Question.php?question_id=<?php echo $question['id_question']; ?>" class="text-decoration-none text-dark">
                                 <h3><?php echo $question['titre']; ?></h3>
                             </a>
                             <div class="d-flex gap-2 mt-2">
