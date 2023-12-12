@@ -6,7 +6,7 @@ $limit_page = 10;
 $page = isset($_POST['page_no']) ? $_POST['page_no'] : 1;
 
 $offset = ($page - 1) * $limit_page;
-$sql = "SELECT * FROM questions INNER JOIN users ON questions.user_id = users.id_user ORDER BY questions.date_creation DESC LIMIT $offset, $limit_page";
+$sql = "SELECT * FROM questions INNER JOIN users ON questions.user_id = users.id_user WHERE archiver = false ORDER BY questions.date_creation DESC LIMIT $offset, $limit_page";
 
 $fetch_query = mysqli_query($conn, $sql);
 
@@ -43,7 +43,7 @@ if ($row_count > 0) {
         <div class="card-footer d-flex justify-content-end gap-3">';
         // Check if the response belongs to the current user
         if ($role == 'scrum_master') {
-            $output .= '<a href="#" class="text-success "><i class="bi bi-archive-fill"></i></a>';
+            $output .= '<a href="archiverQ.php?id=' . $row['id_question'] . '" class="text-success "><i class="bi bi-archive-fill"></i></a>';
         }
         $output .= '
         <p><i class="bi bi-chat"></i> Répondre</p>

@@ -152,7 +152,7 @@ $role= $_SESSION['role'];
 
 $sql = "SELECT * FROM questions 
         INNER JOIN users ON questions.user_id = users.id_user INNER JOIN projets ON questions.projet_id = projets.id_projets
-        WHERE users.id_user = $membre 
+        WHERE users.id_user = $membre AND archiver = false
         ORDER BY questions.date_creation DESC";
 $result = mysqli_query($conn, $sql);
 

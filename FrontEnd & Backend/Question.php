@@ -9,7 +9,7 @@ $role= $_SESSION['role'];
 $sql = "SELECT * FROM questions INNER JOIN users ON questions.user_id  = users.id_user WHERE questions.id_question = $question_id ";
 
 $result = mysqli_query($conn, $sql);
-$row = mysqli_fetch_assoc($result);
+$rowe = mysqli_fetch_assoc($result);
 $membre= $_SESSION['id'];
 
 if (isset($_POST["submit"])) {
@@ -42,12 +42,7 @@ if (isset($_POST["submit"])) {
             <div class="container">
 
                 <img src="../Image/log.png" alt="logo" class="rounded-4" style="width: 80px; height: 60px;">
-                <div class="input-group  ms-md-4 ">
-                    <input type="search" class="form-control rounded" placeholder="Search" aria-label="Search"
-                        aria-describedby="search-addon" />
-                    <button type="button" class="btn btn-outline-primary" data-mdb-ripple-init><i
-                            class="bi bi-search"></i></button>
-                </div>
+
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
@@ -62,7 +57,7 @@ if (isset($_POST["submit"])) {
     if($role == "user") {
         ?>
                         <li class="nav-item">
-                            <a class="nav-link text-center" href="community.php.php">Community</a>
+                            <a class="nav-link text-center" href="community.php">Community</a>
                         </li>
 
                         <li class="nav-item w-1">
@@ -82,7 +77,7 @@ if (isset($_POST["submit"])) {
     } elseif($role == "scrum_master") {
         ?>
                         <li class="nav-item">
-                            <a class="nav-link text-center" href="DashboardScrum.php">Community</a>
+                            <a class="nav-link text-center" href="community.php">Community</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-center" href="DashboardScrum.php">Equipes</a>
@@ -105,7 +100,7 @@ if (isset($_POST["submit"])) {
     } else {
         ?>
                         <li class="nav-item">
-                            <a class="nav-link text-center" href="DashboardScrum.php">Community</a>
+                            <a class="nav-link text-center" href="community.php">Community</a>
                         </li>
                         <li class="nav-item text-center">
                             <a class="nav-link" href="DashboardM.php">Projets</a>
@@ -150,49 +145,74 @@ if (isset($_POST["submit"])) {
 
                 <div class="d-flex  flex-column align-items-start  ">
                     <a href="community.php"
-                        class="col-md-auto col-sm-12 bg-danger p-2 rounded-3 text-light text-decoration-none btn mt-1 d-block d-lg-none w-75"><i
+                        class="col-md-auto col-sm-12 bg-danger p-2 rounded-3 text-light text-decoration-none btn mt-1 d-block d-lg-none w-100"><i
                             class="bi bi-arrow-return-left"></i> Retour</a>
                     <a href="poser_question.php"
-                        class="col-md-auto col-sm-12 bg-primary p-2 rounded-3 text-light text-decoration-none btn mt-4 d-block d-lg-none w-75"><i
+                        class="col-md-auto col-sm-12 bg-primary p-2 rounded-3 text-light text-decoration-none btn mt-4 d-block d-lg-none w-100"><i
                             class="bi bi-bookmark-plus-fill"></i> Poser une question</a>
                     <h2 class="fw-lighter text-primary mt-3">Questions</h2>
-                    <h3 class="mt-3"><?php echo $row['titre']; ?></h3>
-                    <div class="jumbotron bg w-75 ">
-                        <p class="lead mt-3 p-2"><?php echo $row['contenu']; ?> </p>
+                    <h3 class="mt-3"><?php echo $rowe['titre']; ?></h3>
+                    <div class="jumbotron bg w-75 w5 ">
+                        <p class="lead mt-3 p-2"><?php echo $rowe['contenu']; ?> </p>
                         <hr class="my-4">
                         <div class="d-flex justify-content-between px-2">
-                            <p>Poser par : <span
-                                    class="text-danger"><?php echo $row['First_name']. ' ' . $row['Last_name'] ; ?></span>
+                            <p class="text-end">Poser par : <span
+                                    class="text-danger"><?php echo $rowe['First_name']. ' ' . $rowe['Last_name'] ; ?></span>
                             </p>
-                            <p>Poser le : <span class="text-primary"><?php echo $row['date_creation']; ?></span></p>
+                            <p class="text-end">Poser le : <span
+                                    class="text-primary"><?php echo $rowe['date_creation']; ?></span></p>
                         </div>
                     </div>
                     <h2 class="fw-lighter text-primary mt-3">Réponses</h2>
                     <?php
-
-$sql = "SELECT * FROM reponses INNER JOIN users ON reponses.user_id  = users.id_user WHERE reponses.question_id = $question_id ";
+$sql = "SELECT * FROM reponses INNER JOIN users ON reponses.user_id = users.id_user WHERE reponses.question_id = $question_id AND archive = false  ORDER BY reponses.solution DESC, reponses.date_creation";
 
 $result = mysqli_query($conn, $sql);
 
-if(mysqli_num_rows($result) == 0){
-    $message="Il n'y a pas encore de réponse.";
-    
-   } else{
+
+if (mysqli_num_rows($result) == 0) {
+    $message = "Il n'y a pas encore de réponse.";
+} else {
     while ($row = mysqli_fetch_assoc($result)) {
         ?>
-                    <div class="jumbotron bg w-75 mt-2">
-                        <div class="d-flex justify-content-between pt-2 px-3 ">
+                    <div class="jumbotron bg w-75 mt-2 w5">
+                        <div class="d-flex justify-content-between pt-2 px-2 gap-3">
                             <?php
-                // Check if the response belongs to the current user
                 if ($role == 'scrum_master') {
                     ?>
-
-                            <a href="#" class="text-success"><i class="bi bi-archive-fill"></i></a>
+                            <a href="archiverR.php?id=<?php echo $row['id_reponse']; ?>" class="text-success"><i
+                                    class="bi bi-archive-fill"></i></a>
                             <?php
+                }
+
+                if ($rowe['user_id'] == $membre && !$row['solution']) {
+                    ?>
+                            <a href="solution.php?id=<?php echo $row['id_reponse']; ?>"
+                                class="text-center btn btn-outline-warning btn-sm h-50"> <i
+                                    class="bi bi-bookmark-plus"></i> Marquer comme solution</a>
+                            <?php
+                }
+
+                if ($row['solution']) {
+                    if ($rowe['user_id'] == $membre) {
+                        ?>
+                            <a href="Sup_solution.php?id=<?php echo $row['id_reponse']; ?>"
+                                class="text-center btn btn-warning btn-sm h-50"> <i class="bi bi-bookmark-check"></i>
+                                Solution</a>
+                            <?php
+                    } else {
+                        ?>
+                            <p class="text-center btn btn-warning btn-sm h-50"> <i class="bi bi-bookmark-check"></i>
+                                Solution</p>
+                            <?php
+                    }
                 }
                 ?>
 
-                            <p> <span class="text-primary"><?php echo $row['date_creation']; ?></span></p>
+
+
+                            <p class="text-center"> <span
+                                    class="text-primary text-center"><?php echo $row['date_creation']; ?></span></p>
                         </div>
 
                         <p class="lead  px-2 " style="overflow-wrap: break-word; word-wrap: break-word;">
@@ -201,12 +221,13 @@ if(mysqli_num_rows($result) == 0){
                         <hr class="my-4">
                         <div class="d-flex justify-content-between px-2">
                             <p>Répondre par : <span
-                                    class="text-danger"><?php echo $row['First_name']. ' ' . $row['Last_name'] ; ?></span>
+                                    class="text-danger"><?php echo $row['First_name'] . ' ' . $row['Last_name']; ?></span>
                             </p>
+
                             <?php
-                // Check if the response belongs to the current user
+        
                 if ($row['user_id'] == $membre) {
-                    ?>
+                ?>
                             <div class="d-flex justify-content-center me-5">
                                 <a href="supprimer_reponse.php?id=<?php echo $row['id_reponse']; ?>"
                                     class="text-danger ms-4 text-center">
@@ -220,20 +241,22 @@ if(mysqli_num_rows($result) == 0){
                             <?php
                 }
                 ?>
+
                             <div class="d-flex justify-content-center gap-3">
                                 <p onclick="myFunction(this)" class="like"><i class="fa fa-thumbs-up"></i> 1</p>
-                                <p onclick="yourFunction(this)" class="dislike"><i class="fa fa-thumbs-down"></i> 1
-                                </p>
+                                <p onclick="yourFunction(this)" class="dislike"><i class="fa fa-thumbs-down"></i> 1</p>
                             </div>
                         </div>
                     </div>
                     <?php
     }
-} 
+}
 ?>
+
+
                     <p class="text-center fs-5 fw-bolder text-danger"><?php echo $message;?></p>
 
-                    <form method="post" action="" class="w-75 ">
+                    <form method="post" action="" class="w-75 w5 ">
                         <h2 class="fw-lighter text-primary mt-3">Répondre</h2>
                         <div class="form-floating mt-3  ">
                             <textarea name="text" class="form-control bg h-80" placeholder="Leave a comment here"
