@@ -1,6 +1,6 @@
 <?php
 session_start();
-include "FrontEnd & Backend/connexion.php";
+include "connexion.php";
 $membre= $_SESSION['id'];
 $select="SELECT * FROM users WHERE id_user=$membre";
   $query = mysqli_query($conn,$select);
@@ -75,7 +75,7 @@ $select="SELECT * FROM users WHERE id_user=$membre";
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
-    <link rel="stylesheet" href="FrontEnd & Backend/style.css" type="text/css">
+    <link rel="stylesheet" href="style.css" type="text/css">
 
     <title>Document</title>
 </head>
@@ -84,7 +84,7 @@ $select="SELECT * FROM users WHERE id_user=$membre";
     <header>
         <nav class="navbar navbar-expand-lg navbar-scroll  shadow-0 border-bottom border-dark">
             <div class="container">
-                <img src="Image/log.png" alt="logo" class="rounded-4" style="width: 80px; height: 60px;">
+                <img src="../Image/log.png" alt="logo" class="rounded-4" style="width: 80px; height: 60px;">
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
@@ -115,7 +115,7 @@ $select="SELECT * FROM users WHERE id_user=$membre";
                             <h3 class="mb-0 text-center text-light fw-light w-100">Poser une question</h3>
                         </div>
                         <div class="card-body bg1 d-flex flex-column align-items-center w-100">
-                            <img src="Image/data.png" class="img-fluid " alt="img">
+                            <img src="../Image/data.png" class="img-fluid " alt="img">
                             <form method="post" action="">
                                 <div class="d-flex flex-row gap-2">
                                     <div class="form-floating mb-3 mt-3 ">

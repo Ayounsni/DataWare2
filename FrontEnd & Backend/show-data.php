@@ -1,5 +1,5 @@
 <?php
-include("./FrontEnd & Backend/connexion.php");
+include("connexion.php");
 
 $limit_page = 10;
 $page = isset($_POST['page_no']) ? $_POST['page_no'] : 1;
