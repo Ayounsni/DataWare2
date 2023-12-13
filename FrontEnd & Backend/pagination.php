@@ -1,5 +1,9 @@
 <?php
 session_start();
+if($_SESSION['autoriser'] != "oui"){
+  header("Location: index.php");
+  exit();
+}
 $role= $_SESSION['role'];
 include("connexion.php");
 $limit_page = 10;

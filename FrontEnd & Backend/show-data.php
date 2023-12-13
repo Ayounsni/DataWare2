@@ -1,8 +1,15 @@
 <?php
+session_start();
+if($_SESSION['autoriser'] != "oui"){
+  header("Location: index.php");
+  exit();
+}
 include("connexion.php");
-
+include("server.php");
 $limit_page = 10;
+
 $page = isset($_POST['page_no']) ? $_POST['page_no'] : 1;
+
 $offset = ($page - 1) * $limit_page;
 
 // Check if cat_name is set
@@ -30,7 +37,7 @@ if ($row_count > 0) {
                 <a href="Question.php?id=' . $row['id_question'] . '" class="text-decoration-none text-dark">
                     <h3>' . $row['titre'] . '</h3>
                 </a>
-                <div class="d-flex gap-2 mt-2">';
+                <div class="d-flex gap-2">';
 
         // Display tags
         $question_id = $row['id_question'];
@@ -46,9 +53,14 @@ if ($row_count > 0) {
 
         $output .= '</div>
                     <div class="card-footer d-flex justify-content-end gap-3">
-                        <p><i class="bi bi-chat"></i> Répondre</p>
-                        <p onclick="myFunction(this)" class="like"><i class="fa fa-thumbs-up"></i> 1</p>
-                        <p onclick="yourFunction(this)" class="dislike"><i class="fa fa-thumbs-down"></i> 1</p>
+                        <!-- Like and Dislike buttons -->
+                        <i ' . ((userLiked($question_id)) ? 'class="fa fa-thumbs-up like-btn text-success"' : 'class="fa fa-thumbs-o-up like-btn"') . '
+                            data-id="' . $question_id . '"></i>
+                        <span class="likes">' . getLikes($question_id) . '</span>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <i ' . ((userDisliked($question_id)) ? 'class="fa fa-thumbs-down dislike-btn text-danger"' : 'class="fa fa-thumbs-o-down dislike-btn"') . '
+                            data-id="' . $question_id . '"></i>
+                        <span class="dislikes">' . getDislikes($question_id) . '</span>
                     </div>
                 </div>
             </div>';

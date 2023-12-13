@@ -5,9 +5,12 @@ session_start();
 if($_SESSION['autoriser'] != "oui"){
   header("Location: index.php");
   exit();
-  
-
 }
+if($_SESSION['role'] != "user"){
+    header("Location: community.php");
+    exit();
+  
+  }
 $user= $_SESSION['username'];
 $membre= $_SESSION['id'];
 
@@ -38,6 +41,9 @@ $membre= $_SESSION['id'];
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ms-auto d-flex gap-5">
+                        <li class="nav-item">
+                            <a class="nav-link text-center" href="community.php">Community</a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link text-center" href="DashboardUser.php">Mes équipes</a>
                         </li>

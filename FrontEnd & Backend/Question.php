@@ -1,6 +1,12 @@
 <?php
 session_start();
+if($_SESSION['autoriser'] != "oui"){
+  header("Location: index.php");
+  exit();
+}
 include "connexion.php";
+include('votes.php');
+
 $message="";
 $question_id = $_GET['id'];
 $_SESSION['question'] = $_GET['id'];
@@ -111,9 +117,6 @@ if (isset($_POST["submit"])) {
                         <li class="nav-item text-center">
                             <a class="nav-link" href="assigner.php">Assignation</a>
                         </li>
-                        <li class="nav-item text-center">
-                            <a class="nav-link" href="pr.php">Statistique</a>
-                        </li>
                         <li class="nav-item">
                             <a href="deconnexion.php"
                                 class="btn bg-danger p-2 rounded-3 text-light text-decoration-none d-flex gap-1 ">
@@ -178,6 +181,7 @@ if (mysqli_num_rows($result) == 0) {
 } else {
     while ($row = mysqli_fetch_assoc($result)) {
         ?>
+
                     <div class="jumbotron bg w-75 mt-2 w5">
                         <div class="d-flex justify-content-between pt-2 px-2 gap-3">
                             <?php
@@ -212,6 +216,8 @@ if (mysqli_num_rows($result) == 0) {
                 }
                 ?>
 
+
+
                             <p class="text-center"> <span
                                     class="text-primary text-center"><?php echo $row['date_creation']; ?></span></p>
                         </div>
@@ -221,7 +227,7 @@ if (mysqli_num_rows($result) == 0) {
 
                         <hr class="my-4">
                         <div class="d-flex justify-content-between px-2">
-                            <p>Répondre par : <span
+                            <p>Répondu par : <span
                                     class="text-danger"><?php echo $row['First_name'] . ' ' . $row['Last_name']; ?></span>
                             </p>
 
@@ -242,10 +248,17 @@ if (mysqli_num_rows($result) == 0) {
                             <?php
                 }
                 ?>
-
-                            <div class="d-flex justify-content-center gap-3">
-                                <p onclick="myFunction(this)" class="like"><i class="fa fa-thumbs-up"></i> 1</p>
-                                <p onclick="yourFunction(this)" class="dislike"><i class="fa fa-thumbs-down"></i> 1</p>
+                            <div class="d-flex justify-content-end gap-3">
+                                <i <?php if (userLiked($row['id_reponse'])): ?> class="fa fa-thumbs-up like-btn "
+                                    <?php else: ?> class="fa fa-thumbs-o-up like-btn " <?php endif ?>
+                                    data-id="<?php echo $row['id_reponse'] ?>"></i>
+                                <span class="likes"><?php echo getLikes($row['id_reponse']); ?></span>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <i <?php if (userDisliked($row['id_reponse'])): ?>
+                                    class="fa fa-thumbs-down dislike-btn " <?php else: ?>
+                                    class="fa fa-thumbs-o-down dislike-btn " <?php endif ?>
+                                    data-id="<?php echo $row['id_reponse'] ?>"></i>
+                                <span class="dislikes"><?php echo getDislikes($row['id_reponse']); ?></span>
                             </div>
                         </div>
                     </div>
@@ -274,17 +287,126 @@ if (mysqli_num_rows($result) == 0) {
 
 
 
-                    <script>
-                    function myFunction(x) {
-                        x.classList.toggle("text-success");
-                    }
-
-                    function yourFunction(x) {
-                        x.classList.toggle("text-danger");
-                    }
+                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
                     </script>
 
-                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
+                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+                    <!-- Include jQuery library -->
+                    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+                    <script>
+                    $(document).ready(function() {
+
+                        // if the user clicks on the like button ...
+                        $('.like-btn').on('click', function() {
+                            var reponse_id = $(this).data('id');
+                            $clicked_btn = $(this);
+
+                            if ($clicked_btn.hasClass('fa-thumbs-o-up')) {
+                                action = 'like';
+                            } else if ($clicked_btn.hasClass('fa-thumbs-up')) {
+                                action = 'unlike';
+                            }
+
+                            $.ajax({
+                                url: 'Question.php', // Replace with the correct PHP script handling votes
+                                type: 'post',
+                                data: {
+                                    'action': action,
+                                    'reponse_id': reponse_id
+                                },
+                                success: function(data) {
+                                    res = JSON.parse(data);
+                                    if (action == "like") {
+                                        $clicked_btn.removeClass(
+                                            'fa-thumbs-o-up ');
+                                        $clicked_btn.addClass('fa-thumbs-up ');
+                                    } else if (action == "unlike") {
+                                        $clicked_btn.removeClass('fa-thumbs-up');
+                                        $clicked_btn.addClass('fa-thumbs-o-up');
+                                    }
+
+                                    // display the number of likes and dislikes
+                                    $clicked_btn.siblings('span.likes').text(res.likes);
+                                    $clicked_btn.siblings('span.dislikes').text(res
+                                        .dislikes);
+
+                                    // change button styling of the other button if user is reacting the second time to post
+                                    $clicked_btn.siblings('i.fa-thumbs-down').removeClass(
+                                            'fa-thumbs-down')
+                                        .addClass('fa-thumbs-o-down');
+                                }
+                            });
+                        });
+
+                        // if the user clicks on the dislike button ...
+                        $('.dislike-btn').on('click', function() {
+                            var reponse_id = $(this).data('id');
+                            $clicked_btn = $(this);
+
+                            if ($clicked_btn.hasClass('fa-thumbs-o-down')) {
+                                action = 'dislike';
+                            } else if ($clicked_btn.hasClass('fa-thumbs-down')) {
+                                action = 'undislike';
+                            }
+
+                            $.ajax({
+                                url: 'Question.php', // Replace with the correct PHP script handling votes
+                                type: 'post',
+                                data: {
+                                    'action': action,
+                                    'reponse_id': reponse_id
+                                },
+                                success: function(data) {
+                                    res = JSON.parse(data);
+                                    if (action == "dislike") {
+                                        $clicked_btn.removeClass('fa-thumbs-o-down');
+                                        $clicked_btn.addClass('fa-thumbs-down');
+                                    } else if (action == "undislike") {
+                                        $clicked_btn.removeClass('fa-thumbs-down');
+                                        $clicked_btn.addClass('fa-thumbs-o-down');
+                                    }
+
+                                    // display the number of likes and dislikes
+                                    $clicked_btn.siblings('span.likes').text(res.likes);
+                                    $clicked_btn.siblings('span.dislikes').text(res
+                                        .dislikes);
+
+                                    // change button styling of the other button if user is reacting the second time to post
+                                    $clicked_btn.siblings('i.fa-thumbs-up').removeClass(
+                                            'fa-thumbs-up')
+                                        .addClass('fa-thumbs-o-up');
+                                }
+                            });
+                        });
+
+                        // if the user clicks on the mark as solution button ...
+                        $('.mark-solution-btn').on('click', function() {
+                            var reponse_id = $(this).data('id');
+
+                            $.ajax({
+                                url: 'MarkSolution.php',
+                                type: 'post',
+                                data: {
+                                    'reponse_id': reponse_id
+                                },
+                                success: function(data) {
+                                    res = JSON.parse(data);
+                                    if (res.success) {
+                                        alert('Answer marked as solution!');
+                                        // Refresh the page or update the UI dynamically
+                                        location.reload();
+                                    } else {
+                                        alert('Error marking answer as solution');
+                                    }
+                                },
+                                error: function(jqXHR, textStatus, errorThrown) {
+                                    console.error('Error marking solution:', textStatus,
+                                        errorThrown);
+                                }
+                            });
+                        });
+
+                    });
                     </script>
 
 

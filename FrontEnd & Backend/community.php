@@ -104,9 +104,6 @@ $user= $_SESSION['username'];
                         <li class="nav-item text-center">
                             <a class="nav-link" href="assigner.php">Assignation</a>
                         </li>
-                        <li class="nav-item text-center">
-                            <a class="nav-link" href="pr.php">Statistique</a>
-                        </li>
                         <li class="nav-item">
                             <a href="deconnexion.php"
                                 class="btn bg-danger p-2 rounded-3 text-light text-decoration-none d-flex gap-1 ">
@@ -187,15 +184,6 @@ $user= $_SESSION['username'];
 
 
 
-            <script>
-            function myFunction(x) {
-                x.classList.toggle("text-success");
-            }
-
-            function yourFunction(x) {
-                x.classList.toggle("text-danger");
-            }
-            </script>
 
 
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -260,6 +248,62 @@ $(document).ready(function() {
             $('.errMsg').text(msg);
             $(outputDiv).empty();
         }
+    });
+});
+
+$(document).ready(function() {
+    // if the user clicks on the like button ...
+    $(document).on('click', '.like-btn', function() {
+        var question_id = $(this).data('id');
+        $clicked_btn = $(this);
+
+        // Check if the button is currently in the like state
+        var isLiked = $clicked_btn.hasClass('text-success');
+
+        $.ajax({
+            url: 'show-data.php',
+            type: 'post',
+            data: {
+                'action': isLiked ? 'unlike' : 'like',
+                'question_id': question_id
+            },
+            success: function(data) {
+                res = JSON.parse(data);
+                // Toggle classes based on the action performed
+                $clicked_btn.toggleClass('text-success');
+                // Display the number of likes and dislikes
+                $clicked_btn.siblings('span.likes').text(res.likes);
+                $clicked_btn.siblings('i.dislike-btn').removeClass('text-danger');
+                $clicked_btn.siblings('span.dislikes').text(res.dislikes);
+            }
+        });
+    });
+
+    // if the user clicks on the dislike button ...
+    $(document).on('click', '.dislike-btn', function() {
+        var question_id = $(this).data('id');
+        $clicked_btn = $(this);
+
+        // Check if the button is currently in the dislike state
+        var isDisliked = $clicked_btn.hasClass('text-danger');
+
+        $.ajax({
+            url: 'show-data.php',
+            type: 'post',
+            data: {
+                'action': isDisliked ? 'undislike' : 'dislike',
+                'question_id': question_id
+            },
+            success: function(data) {
+                res = JSON.parse(data);
+                // Toggle classes based on the action performed
+                $clicked_btn.toggleClass('text-danger');
+                $clicked_btn.siblings('i.like-btn').removeClass('text-success');
+                // Display the number of likes and dislikes
+                $clicked_btn.siblings('span.likes').text(res.likes);
+                $clicked_btn.siblings('span.dislikes').text(res.dislikes);
+            }
+        });
     });
 });
 </script>

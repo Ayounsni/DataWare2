@@ -1,5 +1,9 @@
 <?php
 session_start();
+if($_SESSION['autoriser'] != "oui"){
+  header("Location: index.php");
+  exit();
+}
 include "connexion.php";
 $id=$_SESSION['question'];
 $reponse_id = $_GET['id'];

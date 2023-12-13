@@ -1,4 +1,9 @@
 <?php
+session_start();
+if($_SESSION['autoriser'] != "oui"){
+  header("Location: index.php");
+  exit();
+}
 include "connexion.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['input'])) {

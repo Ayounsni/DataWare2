@@ -5,9 +5,12 @@ session_start();
 if($_SESSION['autoriser'] != "oui"){
   header("Location: index.php");
   exit();
-  
-
 }
+if($_SESSION['role'] != "user"){
+    header("Location: community.php");
+    exit();
+  
+  }
 $user= $_SESSION['username'];
 $membre= $_SESSION['id'];
 
