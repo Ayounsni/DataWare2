@@ -53,9 +53,28 @@ body{
   color: #DC3545;
 }
 .bg{
-  background-color: #e9ecef;
+  background-color: #e9ecef !important;
+}
+.bg1{
+  background-color: #b2c9ed;
 }
 .h-80{
   height: 200px !important;
 }
+@media screen and (min-width: 1200px) {
+  .w{
+    width: 700px !important;
+   }
+   .w1{
+    width: 600px !important;
+   }
+  }
 
+  @media screen and (max-width: 767px) {
+    .fs{
+      font-size: 10px !important;
+    }
+    .w5{
+      width: 350px !important;
+    }
+  }

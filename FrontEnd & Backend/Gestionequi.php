@@ -7,8 +7,12 @@ if($_SESSION['autoriser'] != "oui"){
   header("Location: index.php");
   exit();
   
-
 }
+if($_SESSION['role'] != "scrum_master"){
+    header("Location: community.php");
+    exit();
+  
+  }
 $user= $_SESSION['username'];
 $membre= $_SESSION['id'];
 
@@ -39,6 +43,9 @@ $membre= $_SESSION['id'];
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ms-auto d-flex gap-5">
+                        <li class="nav-item text-center">
+                            <a class="nav-link" href="community.php">Community</a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link text-center" href="DashboardScrum.php">Equipes</a>
                         </li>
