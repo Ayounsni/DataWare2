@@ -5,7 +5,7 @@ if($_SESSION['autoriser'] != "oui"){
   exit();
 }
 include "connexion.php";
-include("server.php");
+include "server.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['input'])) {
     $inputValues = $_POST['input'];
