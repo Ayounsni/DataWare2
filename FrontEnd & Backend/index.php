@@ -1,5 +1,12 @@
 <?php
+    session_start();
 include "connexion.php";
+
+if (isset($_SESSION['autoriser']) && $_SESSION['autoriser'] == "oui") {
+    // Utilisateur déjà connecté, rediriger vers la page d'accueil ou une autre page
+    header("Location: community.php");
+    exit();
+}
 $erreur="";
 if (isset($_POST["submit"])){
   
@@ -13,7 +20,6 @@ if (isset($_POST["submit"])){
     $username=$fetch['Last_name'];
     $membre=$fetch['id_user'];
     $rol=$fetch['role'];
-    session_start();
     $_SESSION['username']=$username;
     $_SESSION['id']=$membre;
     $_SESSION['role']=$rol;

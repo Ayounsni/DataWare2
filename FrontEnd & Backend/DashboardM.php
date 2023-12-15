@@ -5,9 +5,12 @@ session_start();
 if($_SESSION['autoriser'] != "oui"){
   header("Location: index.php");
   exit();
-  
-
 }
+if($_SESSION['role'] != "product_owner"){
+    header("Location: community.php");
+    exit();
+  
+  }
 $user= $_SESSION['username'];
 
 ?>
@@ -49,6 +52,9 @@ $user= $_SESSION['username'];
                         </li>
                         <li class="nav-item text-center">
                             <a class="nav-link" href="assigner.php">Assignation</a>
+                        </li>
+                        <li class="nav-item text-center">
+                            <a class="nav-link" href="pr.php">Statistique</a>
                         </li>
 
                         <a href="deconnexion.php"

@@ -2,6 +2,11 @@
 include "connexion.php";
 session_start();
 
+if($_SESSION['autoriser'] != "oui"){
+  header("Location: index.php");
+  exit();
+}
+
 if (isset($_POST["submit"])) {
   // Récupérer les valeurs du formulaire
   $selectedEquipe = $_POST["equipe"];

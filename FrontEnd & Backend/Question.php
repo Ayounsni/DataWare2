@@ -1,39 +1,31 @@
 <?php
 session_start();
-include "connexion.php";
-$message = "";
-$question_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-
-if (!$question_id) {
-    echo "ID de question non valide.";
-    exit;
-} else {
-    $_SESSION['question'] = $question_id;
-    $user = $_SESSION['username'] ?? null;
-    $role = $_SESSION['role'] ?? null;
-
-    $sql = "SELECT * FROM questions INNER JOIN users ON questions.user_id = users.id_user WHERE questions.id_question = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $question_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    $row = $result->fetch_assoc();
-
-    $membre = $_SESSION['id'] ?? null;
-
-    if (isset($_POST["submit"])) {
-        $text = htmlspecialchars($_POST["text"]);
-
-        $requete = "INSERT INTO reponses (user_id, question_id, contenu) VALUES (?, ?, ?)";
-        $query = $conn->prepare($requete);
-        $query->bind_param("iss", $membre, $question_id, $text);
-        $query->execute();
-
-        header("Location: Question.php?id=$question_id");
-        exit();
-    }
+if($_SESSION['autoriser'] != "oui"){
+  header("Location: index.php");
+  exit();
 }
+include "connexion.php";
+include('votes.php');
+
+$message="";
+$question_id = $_GET['id'];
+$_SESSION['question'] = $_GET['id'];
+$user= $_SESSION['username'];
+$role= $_SESSION['role'];
+$sql = "SELECT * FROM questions INNER JOIN users ON questions.user_id  = users.id_user WHERE questions.id_question = $question_id ";
+
+$result = mysqli_query($conn, $sql);
+$rowe = mysqli_fetch_assoc($result);
+$membre= $_SESSION['id'];
+
+if (isset($_POST["submit"])) {
+    $text = $_POST["text"];
+    
+    $requete = "INSERT INTO reponses (user_id , question_id, contenu) VALUES ('$membre', '$question_id', '$text')";
+      $query = mysqli_query($conn, $requete);
+      header("Location: Question.php?id=$question_id");
+  }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -56,12 +48,7 @@ if (!$question_id) {
             <div class="container">
 
                 <img src="../Image/log.png" alt="logo" class="rounded-4" style="width: 80px; height: 60px;">
-                <div class="input-group  ms-md-4 ">
-                    <input type="search" class="form-control rounded" placeholder="Search" aria-label="Search"
-                        aria-describedby="search-addon" />
-                    <button type="button" class="btn btn-outline-primary" data-mdb-ripple-init><i
-                            class="bi bi-search"></i></button>
-                </div>
+
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
@@ -96,7 +83,7 @@ if (!$question_id) {
     } elseif($role == "scrum_master") {
         ?>
                         <li class="nav-item">
-                            <a class="nav-link text-center" href="DashboardScrum.php">Community</a>
+                            <a class="nav-link text-center" href="community.php">Community</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-center" href="DashboardScrum.php">Equipes</a>
@@ -119,7 +106,7 @@ if (!$question_id) {
     } else {
         ?>
                         <li class="nav-item">
-                            <a class="nav-link text-center" href="DashboardScrum.php">Community</a>
+                            <a class="nav-link text-center" href="community.php">Community</a>
                         </li>
                         <li class="nav-item text-center">
                             <a class="nav-link" href="DashboardM.php">Projets</a>
@@ -164,49 +151,75 @@ if (!$question_id) {
 
                 <div class="d-flex  flex-column align-items-start  ">
                     <a href="community.php"
-                        class="col-md-auto col-sm-12 bg-danger p-2 rounded-3 text-light text-decoration-none btn mt-1 d-block d-lg-none w-75"><i
+                        class="col-md-auto col-sm-12 bg-danger p-2 rounded-3 text-light text-decoration-none btn mt-1 d-block d-lg-none w-100"><i
                             class="bi bi-arrow-return-left"></i> Retour</a>
                     <a href="poser_question.php"
-                        class="col-md-auto col-sm-12 bg-primary p-2 rounded-3 text-light text-decoration-none btn mt-4 d-block d-lg-none w-75"><i
+                        class="col-md-auto col-sm-12 bg-primary p-2 rounded-3 text-light text-decoration-none btn mt-4 d-block d-lg-none w-100"><i
                             class="bi bi-bookmark-plus-fill"></i> Poser une question</a>
                     <h2 class="fw-lighter text-primary mt-3">Questions</h2>
-                    <h3 class="mt-3"><?php echo $row['titre']; ?></h3>
-                    <div class="jumbotron bg w-75 ">
-                        <p class="lead mt-3 p-2"><?php echo $row['contenu']; ?> </p>
+                    <h3 class="mt-3"><?php echo $rowe['titre']; ?></h3>
+                    <div class="jumbotron bg w-75 w5 ">
+                        <p class="lead mt-3 p-2"><?php echo $rowe['contenu']; ?> </p>
                         <hr class="my-4">
                         <div class="d-flex justify-content-between px-2">
-                            <p>Poser par : <span
-                                    class="text-danger"><?php echo $row['First_name']. ' ' . $row['Last_name'] ; ?></span>
+                            <p class="text-end">Poser par : <span
+                                    class="text-danger"><?php echo $rowe['First_name']. ' ' . $rowe['Last_name'] ; ?></span>
                             </p>
-                            <p>Poser le : <span class="text-primary"><?php echo $row['date_creation']; ?></span></p>
+                            <p class="text-end">Poser le : <span
+                                    class="text-primary"><?php echo $rowe['date_creation']; ?></span></p>
                         </div>
                     </div>
                     <h2 class="fw-lighter text-primary mt-3">Réponses</h2>
                     <?php
-
-$sql = "SELECT * FROM reponses INNER JOIN users ON reponses.user_id  = users.id_user WHERE reponses.question_id = $question_id AND reponses.archivee = 0";
+$sql = "SELECT * FROM reponses INNER JOIN users ON reponses.user_id = users.id_user WHERE reponses.question_id = $question_id AND archive = false  ORDER BY reponses.solution DESC, reponses.date_creation";
 
 $result = mysqli_query($conn, $sql);
 
-if(mysqli_num_rows($result) == 0){
-    $message="Il n'y a pas encore de réponse.";
-    
-   } else{
+
+if (mysqli_num_rows($result) == 0) {
+    $message = "Il n'y a pas encore de réponse.";
+} else {
     while ($row = mysqli_fetch_assoc($result)) {
         ?>
-                    <div class="jumbotron bg w-75 mt-2">
-                        <div class="d-flex justify-content-between pt-2 px-3 ">
+
+                    <div class="jumbotron bg w-75 mt-2 w5">
+                        <div class="d-flex justify-content-between pt-2 px-2 gap-3">
                             <?php
-                // Check if the response belongs to the current user
                 if ($role == 'scrum_master') {
                     ?>
-
-<a href="archiver_reponses.php?reponse_id=<?php echo $row['id_reponse']; ?>" class="text-success"><i class="bi bi-archive-fill"></i></a>
+                            <a href="archiverR.php?id=<?php echo $row['id_reponse']; ?>" class="text-success"><i
+                                    class="bi bi-archive-fill"></i></a>
                             <?php
+                }
+
+                if ($rowe['user_id'] == $membre && !$row['solution']) {
+                    ?>
+                            <a href="solution.php?id=<?php echo $row['id_reponse']; ?>"
+                                class="text-center btn btn-outline-warning btn-sm h-50"> <i
+                                    class="bi bi-bookmark-plus"></i> Marquer comme solution</a>
+                            <?php
+                }
+
+                if ($row['solution']) {
+                    if ($rowe['user_id'] == $membre) {
+                        ?>
+                            <a href="Sup_solution.php?id=<?php echo $row['id_reponse']; ?>"
+                                class="text-center btn btn-warning btn-sm h-50"> <i class="bi bi-bookmark-check"></i>
+                                Solution</a>
+                            <?php
+                    } else {
+                        ?>
+                            <p class="text-center btn btn-warning btn-sm h-50"> <i class="bi bi-bookmark-check"></i>
+                                Solution</p>
+                            <?php
+                    }
                 }
                 ?>
 
-                            <p> <span class="text-primary"><?php echo $row['date_creation']; ?></span></p>
+
+
+                            <p class="text-center"> <span
+                                    class="text-primary text-center"><?php echo $row['date_creation']; ?></span></p>
                         </div>
 
                         <p class="lead  px-2 " style="overflow-wrap: break-word; word-wrap: break-word;">
@@ -214,13 +227,14 @@ if(mysqli_num_rows($result) == 0){
 
                         <hr class="my-4">
                         <div class="d-flex justify-content-between px-2">
-                            <p>Répondre par : <span
-                                    class="text-danger"><?php echo $row['First_name']. ' ' . $row['Last_name'] ; ?></span>
+                            <p>Répondu par : <span
+                                    class="text-danger"><?php echo $row['First_name'] . ' ' . $row['Last_name']; ?></span>
                             </p>
+
                             <?php
-                // Check if the response belongs to the current user
+        
                 if ($row['user_id'] == $membre) {
-                    ?>
+                ?>
                             <div class="d-flex justify-content-center me-5">
                                 <a href="supprimer_reponse.php?id=<?php echo $row['id_reponse']; ?>"
                                     class="text-danger ms-4 text-center">
@@ -234,20 +248,29 @@ if(mysqli_num_rows($result) == 0){
                             <?php
                 }
                 ?>
-                            <div class="d-flex justify-content-center gap-3">
-                                <p onclick="myFunction(this)" class="like"><i class="fa fa-thumbs-up"></i> 1</p>
-                                <p onclick="yourFunction(this)" class="dislike"><i class="fa fa-thumbs-down"></i> 1
-                                </p>
+                            <div class="d-flex justify-content-end gap-3">
+                                <i <?php if (userLiked($row['id_reponse'])): ?> class="fa fa-thumbs-up like-btn "
+                                    <?php else: ?> class="fa fa-thumbs-o-up like-btn " <?php endif ?>
+                                    data-id="<?php echo $row['id_reponse'] ?>"></i>
+                                <span class="likes"><?php echo getLikes($row['id_reponse']); ?></span>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <i <?php if (userDisliked($row['id_reponse'])): ?>
+                                    class="fa fa-thumbs-down dislike-btn " <?php else: ?>
+                                    class="fa fa-thumbs-o-down dislike-btn " <?php endif ?>
+                                    data-id="<?php echo $row['id_reponse'] ?>"></i>
+                                <span class="dislikes"><?php echo getDislikes($row['id_reponse']); ?></span>
                             </div>
                         </div>
                     </div>
                     <?php
     }
-} 
+}
 ?>
+
+
                     <p class="text-center fs-5 fw-bolder text-danger"><?php echo $message;?></p>
 
-                    <form method="post" action="" class="w-75 ">
+                    <form method="post" action="" class="w-75 w5 ">
                         <h2 class="fw-lighter text-primary mt-3">Répondre</h2>
                         <div class="form-floating mt-3  ">
                             <textarea name="text" class="form-control bg h-80" placeholder="Leave a comment here"
@@ -264,17 +287,126 @@ if(mysqli_num_rows($result) == 0){
 
 
 
-                    <script>
-                    function myFunction(x) {
-                        x.classList.toggle("text-success");
-                    }
-
-                    function yourFunction(x) {
-                        x.classList.toggle("text-danger");
-                    }
+                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
                     </script>
 
-                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
+                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+                    <!-- Include jQuery library -->
+                    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+                    <script>
+                    $(document).ready(function() {
+
+                        // if the user clicks on the like button ...
+                        $('.like-btn').on('click', function() {
+                            var reponse_id = $(this).data('id');
+                            $clicked_btn = $(this);
+
+                            if ($clicked_btn.hasClass('fa-thumbs-o-up')) {
+                                action = 'like';
+                            } else if ($clicked_btn.hasClass('fa-thumbs-up')) {
+                                action = 'unlike';
+                            }
+
+                            $.ajax({
+                                url: 'Question.php', // Replace with the correct PHP script handling votes
+                                type: 'post',
+                                data: {
+                                    'action': action,
+                                    'reponse_id': reponse_id
+                                },
+                                success: function(data) {
+                                    res = JSON.parse(data);
+                                    if (action == "like") {
+                                        $clicked_btn.removeClass(
+                                            'fa-thumbs-o-up ');
+                                        $clicked_btn.addClass('fa-thumbs-up ');
+                                    } else if (action == "unlike") {
+                                        $clicked_btn.removeClass('fa-thumbs-up');
+                                        $clicked_btn.addClass('fa-thumbs-o-up');
+                                    }
+
+                                    // display the number of likes and dislikes
+                                    $clicked_btn.siblings('span.likes').text(res.likes);
+                                    $clicked_btn.siblings('span.dislikes').text(res
+                                        .dislikes);
+
+                                    // change button styling of the other button if user is reacting the second time to post
+                                    $clicked_btn.siblings('i.fa-thumbs-down').removeClass(
+                                            'fa-thumbs-down')
+                                        .addClass('fa-thumbs-o-down');
+                                }
+                            });
+                        });
+
+                        // if the user clicks on the dislike button ...
+                        $('.dislike-btn').on('click', function() {
+                            var reponse_id = $(this).data('id');
+                            $clicked_btn = $(this);
+
+                            if ($clicked_btn.hasClass('fa-thumbs-o-down')) {
+                                action = 'dislike';
+                            } else if ($clicked_btn.hasClass('fa-thumbs-down')) {
+                                action = 'undislike';
+                            }
+
+                            $.ajax({
+                                url: 'Question.php', // Replace with the correct PHP script handling votes
+                                type: 'post',
+                                data: {
+                                    'action': action,
+                                    'reponse_id': reponse_id
+                                },
+                                success: function(data) {
+                                    res = JSON.parse(data);
+                                    if (action == "dislike") {
+                                        $clicked_btn.removeClass('fa-thumbs-o-down');
+                                        $clicked_btn.addClass('fa-thumbs-down');
+                                    } else if (action == "undislike") {
+                                        $clicked_btn.removeClass('fa-thumbs-down');
+                                        $clicked_btn.addClass('fa-thumbs-o-down');
+                                    }
+
+                                    // display the number of likes and dislikes
+                                    $clicked_btn.siblings('span.likes').text(res.likes);
+                                    $clicked_btn.siblings('span.dislikes').text(res
+                                        .dislikes);
+
+                                    // change button styling of the other button if user is reacting the second time to post
+                                    $clicked_btn.siblings('i.fa-thumbs-up').removeClass(
+                                            'fa-thumbs-up')
+                                        .addClass('fa-thumbs-o-up');
+                                }
+                            });
+                        });
+
+                        // if the user clicks on the mark as solution button ...
+                        $('.mark-solution-btn').on('click', function() {
+                            var reponse_id = $(this).data('id');
+
+                            $.ajax({
+                                url: 'MarkSolution.php',
+                                type: 'post',
+                                data: {
+                                    'reponse_id': reponse_id
+                                },
+                                success: function(data) {
+                                    res = JSON.parse(data);
+                                    if (res.success) {
+                                        alert('Answer marked as solution!');
+                                        // Refresh the page or update the UI dynamically
+                                        location.reload();
+                                    } else {
+                                        alert('Error marking answer as solution');
+                                    }
+                                },
+                                error: function(jqXHR, textStatus, errorThrown) {
+                                    console.error('Error marking solution:', textStatus,
+                                        errorThrown);
+                                }
+                            });
+                        });
+
+                    });
                     </script>
 
 

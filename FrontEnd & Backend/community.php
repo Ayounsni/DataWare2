@@ -2,10 +2,10 @@
 session_start();
 include "connexion.php";
 $message="";
+$role= $_SESSION['role'];
 
 
 $user= $_SESSION['username'];
-$role= $_SESSION['role'];
 
 ?>
 <!DOCTYPE html>
@@ -22,36 +22,6 @@ $role= $_SESSION['role'];
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
     <title>Document</title>
-
-    <script>
-    $(document).ready(function() {
-        $('#myInput').on('keyup', function() {
-            let inputValue = this.value;
-            let outputDiv = "#result"; // Utilisez le même ID que celui dans votre page pagination.php
-            console.log('inputValue ', inputValue);
-
-            if (inputValue != "") { // input received
-                $.ajax({
-                    url: "Rechercher_Questions.php",
-                    data: {
-                        'input': inputValue
-                    },
-                    dataType: "html",
-                    type: "POST",
-                    success: function(response) {
-                        $(outputDiv).empty().html(response);
-                    }
-                });
-            } else { // no input found
-                let msg = "Veuillez taper votre question ou le tag.";
-                $('.errMsg').text(msg);
-                $(outputDiv).empty(); // Vide la div des résultats en cas de champ de recherche vide
-            }
-        });
-    });
-    </script>
-
-
 </head>
 
 <body>
@@ -80,7 +50,7 @@ $role= $_SESSION['role'];
     if($role == "user") {
         ?>
                         <li class="nav-item">
-                            <a class="nav-link text-center" href="DashboardScrum.php">Community</a>
+                            <a class="nav-link text-center" href="community.php">Community</a>
                         </li>
 
                         <li class="nav-item w-1">
@@ -100,7 +70,7 @@ $role= $_SESSION['role'];
     } elseif($role == "scrum_master") {
         ?>
                         <li class="nav-item">
-                            <a class="nav-link text-center" href="DashboardScrum.php">Community</a>
+                            <a class="nav-link text-center" href="community.php">Community</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-center" href="DashboardScrum.php">Equipes</a>
@@ -123,7 +93,7 @@ $role= $_SESSION['role'];
     } else {
         ?>
                         <li class="nav-item">
-                            <a class="nav-link text-center" href="DashboardScrum.php">Community</a>
+                            <a class="nav-link text-center" href="community.php">Community</a>
                         </li>
                         <li class="nav-item text-center">
                             <a class="nav-link" href="DashboardM.php">Projets</a>
@@ -144,7 +114,6 @@ $role= $_SESSION['role'];
                         <?php
     }
     ?>
-
                     </ul>
 
                 </div>
@@ -156,14 +125,22 @@ $role= $_SESSION['role'];
         <div class="d-flex flex-lg-row justify-content-between flex-sm-column flex-md-column">
             <div class="d-flex justify-content-center mt-5 w-25 p-3 d-none d-lg-block ">
                 <div class="form-floating w-100">
-                    <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
-                        <option selected>All</option>
+                    <select class="form-control" onchange="selectdata(this.options[this.selectedIndex].value)">
+                        <option value="All">All</option>
                         <?php
-                                $queryProjets = mysqli_query($conn, "SELECT * FROM projets");
-                                while ($Projets = mysqli_fetch_assoc($queryProjets)) {
-                                 echo "<option value='{$Projets['nom_projet']}'>{$Projets['nom_projet']}</option>";
-                              }
-                               ?>
+                // Include your database connection
+                include "FrontEnd & Backend/connexion.php";;
+
+                // Query to get distinct categories
+                $query = "SELECT DISTINCT nom_projet FROM projets";
+                $result = mysqli_query($conn, $query);
+
+                // Display options
+                while ($row = mysqli_fetch_assoc($result)) {
+                    $category = $row['nom_projet'];
+                    echo "<option value='$category'>$category</option>";
+                }
+                ?>
                     </select>
                     <label for="floatingSelect">Filtrer question par projet</label>
                 </div>
@@ -194,9 +171,12 @@ $role= $_SESSION['role'];
 
                     <div id="result" class="d-flex flex-column align-items-center w-100"></div>
 
+                    <div id="result" class="d-flex flex-column align-items-center w-100"></div>
+
 
 
                 </div>
+
 
             </div>
 
@@ -204,15 +184,6 @@ $role= $_SESSION['role'];
 
 
 
-            <script>
-            function myFunction(x) {
-                x.classList.toggle("text-success");
-            }
-
-            function yourFunction(x) {
-                x.classList.toggle("text-danger");
-            }
-            </script>
 
 
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -228,7 +199,7 @@ $(document).ready(function() {
 
 function showdata(page) {
     $.ajax({
-        url: 'pagination.php',
+        url: 'show-data.php',
         method: 'post',
         data: {
             page_no: page
@@ -242,5 +213,97 @@ function showdata(page) {
 $(document).on("click", ".pagination a", function() {
     var page = $(this).attr('id');
     showdata(page);
+});
+
+function selectdata(cat) {
+    $.ajax({
+        url: 'show-data.php',
+        method: 'post',
+        data: 'cat_name=' + cat,
+        success: function(result) {
+            $("#result").html(result);
+        }
+    });
+}
+$(document).ready(function() {
+    $('#myInput').on('keyup', function() {
+        let inputValue = this.value;
+        let outputDiv = "#result";
+        console.log('inputValue ', inputValue);
+
+        if (inputValue != "") {
+            $.ajax({
+                url: "Rechercher_Questions.php",
+                data: {
+                    'input': inputValue
+                },
+                dataType: "html",
+                type: "POST",
+                success: function(response) {
+                    $(outputDiv).empty().html(response);
+                }
+            });
+        } else {
+            let msg = "Veuillez taper votre question ou le tag.";
+            $('.errMsg').text(msg);
+            $(outputDiv).empty();
+        }
+    });
+});
+
+$(document).ready(function() {
+    // if the user clicks on the like button ...
+    $(document).on('click', '.like-btn', function() {
+        var question_id = $(this).data('id');
+        $clicked_btn = $(this);
+
+        // Check if the button is currently in the like state
+        var isLiked = $clicked_btn.hasClass('text-success');
+
+        $.ajax({
+            url: 'show-data.php',
+            type: 'post',
+            data: {
+                'action': isLiked ? 'unlike' : 'like',
+                'question_id': question_id
+            },
+            success: function(data) {
+                res = JSON.parse(data);
+                // Toggle classes based on the action performed
+                $clicked_btn.toggleClass('text-success');
+                // Display the number of likes and dislikes
+                $clicked_btn.siblings('span.likes').text(res.likes);
+                $clicked_btn.siblings('i.dislike-btn').removeClass('text-danger');
+                $clicked_btn.siblings('span.dislikes').text(res.dislikes);
+            }
+        });
+    });
+
+    // if the user clicks on the dislike button ...
+    $(document).on('click', '.dislike-btn', function() {
+        var question_id = $(this).data('id');
+        $clicked_btn = $(this);
+
+        // Check if the button is currently in the dislike state
+        var isDisliked = $clicked_btn.hasClass('text-danger');
+
+        $.ajax({
+            url: 'show-data.php',
+            type: 'post',
+            data: {
+                'action': isDisliked ? 'undislike' : 'dislike',
+                'question_id': question_id
+            },
+            success: function(data) {
+                res = JSON.parse(data);
+                // Toggle classes based on the action performed
+                $clicked_btn.toggleClass('text-danger');
+                $clicked_btn.siblings('i.like-btn').removeClass('text-success');
+                // Display the number of likes and dislikes
+                $clicked_btn.siblings('span.likes').text(res.likes);
+                $clicked_btn.siblings('span.dislikes').text(res.dislikes);
+            }
+        });
+    });
 });
 </script>

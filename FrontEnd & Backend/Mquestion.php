@@ -1,5 +1,9 @@
 <?php
 session_start();
+if($_SESSION['autoriser'] != "oui"){
+  header("Location: index.php");
+  exit();
+}
 include "connexion.php";
 $message="";
 $membre= $_SESSION['id'];
@@ -152,7 +156,7 @@ $role= $_SESSION['role'];
 
 $sql = "SELECT * FROM questions 
         INNER JOIN users ON questions.user_id = users.id_user INNER JOIN projets ON questions.projet_id = projets.id_projets
-        WHERE users.id_user = $membre 
+        WHERE users.id_user = $membre AND archiver = false
         ORDER BY questions.date_creation DESC";
 $result = mysqli_query($conn, $sql);
 
@@ -198,15 +202,7 @@ if ($result) {
                                             <i class=" bi bi-pencil"></i>
                                         </a>
                                     </div>
-                                    <div class=" d-flex justify-content-end gap-3">
-                                        <p><i class="bi bi-chat"></i> Répondre</p>
-                                        <p onclick="myFunction(this)" class="like text-primary"><i
-                                                class="fa fa-thumbs-o-up"></i> 1
-                                        </p>
-                                        <p onclick="yourFunction(this)" class="dislike"><i
-                                                class="fa fa-thumbs-o-down"></i> 1
-                                        </p>
-                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -227,15 +223,7 @@ if ($result) {
 
 
 
-            <script>
-            function myFunction(x) {
-                x.classList.toggle("text-success");
-            }
 
-            function yourFunction(x) {
-                x.classList.toggle("text-danger");
-            }
-            </script>
 
 
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
