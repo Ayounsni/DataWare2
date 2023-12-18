@@ -88,7 +88,7 @@ if (isset($_POST["submit"])) {
                                 </div>
                                 <div class="form-floating mt-3  ">
                                     <textarea name="text" class="form-control h-80" placeholder="Leave a comment here"
-                                        id="floatingTextarea"><?=$row['contenu']?></textarea>
+                                        id="floatingTextarea" required><?=$row['contenu']?></textarea>
                                     <label for=" floatingTextarea" class="text-secondary">Contenu</label>
                                 </div>
                                 <div class="mt-3">

@@ -128,8 +128,7 @@ $user= $_SESSION['username'];
                     <select class="form-control" onchange="selectdata(this.options[this.selectedIndex].value)">
                         <option value="All">All</option>
                         <?php
-                // Include your database connection
-                include "FrontEnd & Backend/connexion.php";;
+        
 
                 // Query to get distinct categories
                 $query = "SELECT DISTINCT nom_projet FROM projets";
@@ -171,7 +170,7 @@ $user= $_SESSION['username'];
 
                     <div id="result" class="d-flex flex-column align-items-center w-100"></div>
 
-                    <div id="result" class="d-flex flex-column align-items-center w-100"></div>
+
 
 
 
@@ -229,9 +228,8 @@ $(document).ready(function() {
     $('#myInput').on('keyup', function() {
         let inputValue = this.value;
         let outputDiv = "#result";
-        console.log('inputValue ', inputValue);
 
-        if (inputValue != "") {
+        if (inputValue !== null) {
             $.ajax({
                 url: "Rechercher_Questions.php",
                 data: {
@@ -244,9 +242,15 @@ $(document).ready(function() {
                 }
             });
         } else {
-            let msg = "Veuillez taper votre question ou le tag.";
-            $('.errMsg').text(msg);
-            $(outputDiv).empty();
+
+            $.ajax({
+                url: "Rechercher_Questions.php",
+                dataType: "html",
+                type: "POST",
+                success: function(response) {
+                    $(outputDiv).empty().html(response);
+                }
+            });
         }
     });
 });

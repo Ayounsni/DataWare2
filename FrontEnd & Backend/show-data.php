@@ -28,10 +28,10 @@ $row_count = mysqli_num_rows($fetch_query);
 
 if ($row_count > 0) {
     while ($row = mysqli_fetch_assoc($fetch_query)) {
-        $output .= '<div class="card w-75 mt-4">
+        $output .= '<div class="card w-75 mt-4 shadow p-3 mb-5 bg-body rounded">
             <div class="card-header d-flex justify-content-between text-danger">
                 <p>' . $row['First_name'] . ' ' . $row['Last_name'] . '</p>
-                <p>' . $row['date_creation'] . '</p>
+                <p>' . date('Y-m-d', strtotime($row['date_creation'])). '</p>
             </div>
             <div class="card-body d-flex flex-column">
                 <a href="Question.php?id=' . $row['id_question'] . '" class="text-decoration-none text-dark">
@@ -53,6 +53,9 @@ if ($row_count > 0) {
 
         $output .= '</div>
                     <div class="card-footer d-flex justify-content-end gap-3">
+                    <a class="text-primary text-decoration-none" href="Question.php?id=' . $row['id_question'] . '" class="text-decoration-none text-dark">
+                    <i class="bi bi-chat"></i> Répondre
+                    </a>
                         <!-- Like and Dislike buttons -->
                         <i ' . ((userLiked($question_id)) ? 'class="fa fa-thumbs-up like-btn text-success"' : 'class="fa fa-thumbs-o-up like-btn"') . '
                             data-id="' . $question_id . '"></i>

@@ -4,6 +4,7 @@ if($_SESSION['autoriser'] != "oui"){
   header("Location: index.php");
   exit();
 }
+$erreur="";
 include "connexion.php";
 $membre= $_SESSION['id'];
 $select="SELECT * FROM users WHERE id_user=$membre";
@@ -12,6 +13,15 @@ $select="SELECT * FROM users WHERE id_user=$membre";
   if (isset($_POST["sub"])) {
     // Retrieve the tags as a string
     $tagsArray = $_POST["tag"];
+    foreach ($tagsArray as $tag) {
+        if (preg_match('/\s/', $tag)) {
+            // Display an error message or handle it as needed
+            $errors['tag'] = "Les tags ne doivent pas contenir d'espaces.";
+            break; // Stop further processing if there's an error
+        }
+    }
+
+    if (empty($errors)) {
 
     // Escape each tag individually
     foreach ($tagsArray as &$tag) {
@@ -26,20 +36,34 @@ $select="SELECT * FROM users WHERE id_user=$membre";
     $tagsArray = explode(",", $tagsString);
 
     foreach ($tagsArray as $tagId) {
-        // Vérification si le tag existe déjà dans la table des tags
-        $tagId = trim($tagId);  // Trim spaces from the tag name
-        $checkQuery = mysqli_query($conn, "SELECT * FROM tags WHERE nom_tag = '$tagId'");
+        // Vérification si le tag existe déjà dans la table des tags avec une requête préparée
+        $tagId = trim($tagId);  // Trim les espaces du nom du tag
+        $checkQuery = mysqli_prepare($conn, "SELECT * FROM tags WHERE nom_tag = ?");
+        mysqli_stmt_bind_param($checkQuery, "s", $tagId);
+        mysqli_stmt_execute($checkQuery);
 
-        if (mysqli_num_rows($checkQuery) == 0 && !empty($tagId)) {
-            // Si le tag n'existe pas et n'est pas vide, l'ajouter à la table des tags
-            mysqli_query($conn, "INSERT INTO tags (nom_tag) VALUES ('$tagId')");
+        // Récupérez le résultat
+        $result = mysqli_stmt_get_result($checkQuery);
+
+        if (mysqli_num_rows($result) == 0 && !empty($tagId)) {
+            // Si le tag n'existe pas et n'est pas vide, l'ajouter à la table des tags avec une requête préparée
+            $insertQuery = mysqli_prepare($conn, "INSERT INTO tags (nom_tag) VALUES (?)");
+            mysqli_stmt_bind_param($insertQuery, "s", $tagId);
+            mysqli_stmt_execute($insertQuery);
         }
         // Vous pouvez également gérer le cas où le tag existe déjà
+
+        // Fermez la requête préparée
+        mysqli_stmt_close($checkQuery);
+        mysqli_stmt_close($insertQuery);
     }
 
-    header("Location: Poser_question.php");
-    exit(); // Make sure to exit after a header redirect
+    header("Location: poser_question.php");
+    exit(); // Assurez-vous de sortir après une redirection d'en-tête
 }
+}
+
+
 
   if (isset($_POST["submit"])) {
     // Récupérer les valeurs du formulaire
@@ -49,21 +73,58 @@ $select="SELECT * FROM users WHERE id_user=$membre";
 
     // Les tags sélectionnés sont un tableau, vous pouvez les récupérer directement
     $tags = $_POST["tags"];
-
-    // Insérer la question dans la table des questions
-    $requeteQuestion = "INSERT INTO questions (projet_id, user_id, titre, contenu) VALUES ('$projet_id', '$membre', '$titre', '$contenu')";
-    mysqli_query($conn, $requeteQuestion);
-    $question_id = mysqli_insert_id($conn); // Récupérer l'ID de la question insérée
-
-    
-
-    // Insérer les tags dans la table de pivot (tag_reponse)
-    foreach ($tags as $tag_id) {
-        $requeteTag = "INSERT INTO question_tags (question_id, tag_id) VALUES ('$question_id', '$tag_id')";
-        mysqli_query($conn, $requeteTag);
+    if (empty($projet_id)) {
+        $errors['projet'] = "Vous n'avez pas de projet.";
     }
 
+    if (empty($titre)) {
+        $errors['name'] = "Le champ Titre est obligatoire.";
+    }
+
+    if (empty($contenu)) {
+        $errors['text'] = "Le champ Contenu est obligatoire.";
+    }
+
+    if (empty($tags)) {
+        $errors['tags'] = "Le champ Tags est obligatoire.";
+    }
+
+    
+    if (!empty($errors)) {
+        // Afficher les erreurs sous chaque champ
+        foreach ($errors as $field => $error) {
+        
+        }
+    } else {
+    
+
+    // Insérer la question dans la table des questions
+    $requeteQuestion = $conn->prepare("INSERT INTO questions (projet_id, user_id, titre, contenu) VALUES (?, ?, ?, ?)");
+    $requeteQuestion->bind_param("iiss", $projet_id, $membre, $titre, $contenu);
+
+    // Exécutez la requête
+    $requeteQuestion->execute();
+
+    // Récupérez l'ID de la question insérée
+    $question_id = mysqli_insert_id($conn);
+
+    // Insérer les tags dans la table de pivot (tag_reponse) avec une requête préparée
+    $requeteTag = $conn->prepare("INSERT INTO question_tags (question_id, tag_id) VALUES (?, ?)");
+
+    // Utilisez la boucle foreach pour exécuter la requête pour chaque tag
+    foreach ($tags as $tag_id) {
+        $requeteTag->bind_param("ii", $question_id, $tag_id);
+        $requeteTag->execute();
+    }
+
+    // Fermez les requêtes préparées
+    $requeteQuestion->close();
+    $requeteTag->close();
+
+    // Redirigez l'utilisateur vers la page community.php
     header("Location: community.php");
+    exit();
+}
 }
 
 
@@ -100,7 +161,7 @@ $select="SELECT * FROM users WHERE id_user=$membre";
                             <a class="nav-link text-center" href="community.php">Community</a>
                         </li>
 
-                        <a href="FrontEnd & Backend/deconnexion.php"
+                        <a href="deconnexion.php"
                             class="btn bg-danger p-2 rounded-3 text-light text-decoration-none "><i
                                 class="bi bi-box-arrow-left"></i> Deconnexion</a>
                     </ul>
@@ -128,7 +189,11 @@ $select="SELECT * FROM users WHERE id_user=$membre";
                                         <label class="text-secondary fs " for="floatingInput">Ajouter les tags (
                                             Entre
                                             chaque tag virgule "," )</label>
+                                        <?php if (isset($errors['tag']) && !empty($errors['tag'])): ?>
+                                        <span style='color: red;'><?= $errors['tag']; ?></span>
+                                        <?php endif; ?>
                                     </div>
+
                                     <button
                                         class="btn btn-primary h-100 align-middle align-self-center btn-md btn-block "
                                         type="submit" name="sub">Ajouter</button>
@@ -139,6 +204,8 @@ $select="SELECT * FROM users WHERE id_user=$membre";
                                 <div class="form-floating w-100 mt-3">
                                     <select class="form-select" name="projet" id="floatingSelect"
                                         aria-label="Floating label select example">
+                                        <option value="" selected>Sélectionnez Projet</option>
+
                                         <?php
                                          if($fetch["role"]== "user"){
                                             $queryProjets = mysqli_query($conn, "SELECT * FROM projets INNER JOIN equipes ON projets.equipe_id = equipes.id_equipe INNER JOIN users ON equipes.id_equipe = users.id_equip  WHERE id_user=$membre ");
@@ -161,22 +228,29 @@ $select="SELECT * FROM users WHERE id_user=$membre";
                               
                                ?>
                                     </select>
-                                    <label for="floatingSelect">Question a propos ce projet</label>
+                                    <label for=" floatingSelect">Question a propos ce projet</label>
+                                    <span
+                                        class="ms-2 text-danger "><?php echo isset($errors['projet']) ? $errors['projet'] : ''; ?></span>
                                 </div>
 
                                 <div class="form-floating mb-3 mt-3 ">
                                     <input type="text" name="name" class="form-control w-100 w" id="floatingInput"
-                                        placeholder="name" required>
+                                        placeholder="name">
                                     <label class="text-secondary " for="floatingInput">Titre de question</label>
+                                    <span
+                                        class="ms-2 text-danger "><?php echo isset($errors['name']) ? $errors['name'] : ''; ?></span>
                                 </div>
                                 <div class="form-floating mt-3  ">
                                     <textarea name="text" class="form-control h-80" placeholder="Leave a comment here"
                                         id="floatingTextarea"></textarea>
                                     <label for=" floatingTextarea" class="text-secondary">Contenu</label>
+                                    <span
+                                        class="ms-2 text-danger "><?php echo isset($errors['text']) ? $errors['text'] : ''; ?></span>
                                 </div>
                                 <div class="mt-3">
                                     <p class="m-0">Ajoutez des tags :</p>
-                                    <select id="tags" name="tags[]" class="form-control" multiple>
+                                    <select id="tags" name="tags[]" class="form-control" multiple required>
+
                                         <?php
                                         $querytags = mysqli_query($conn, "SELECT * FROM tags ");
                                         while ($tags = mysqli_fetch_assoc($querytags)) {
@@ -205,7 +279,7 @@ $select="SELECT * FROM users WHERE id_user=$membre";
             <script>
             $(document).ready(function() {
                 $('#tags').select2({
-                    tags: true, // Permet aux utilisateurs d'ajouter de nouveaux tags
+                    tags: false, // Permet aux utilisateurs d'ajouter de nouveaux tags
                     tokenSeparators: [',', ' '] // Délimiteurs de séparation entre les tags
                 });
             });

@@ -158,7 +158,7 @@ if (isset($_POST["submit"])) {
                             class="bi bi-bookmark-plus-fill"></i> Poser une question</a>
                     <h2 class="fw-lighter text-primary mt-3">Questions</h2>
                     <h3 class="mt-3"><?php echo $rowe['titre']; ?></h3>
-                    <div class="jumbotron bg w-75 w5 ">
+                    <div class="jumbotron bg w-75 w5 shadow p-3 mb-5 bg-body rounded ">
                         <p class="lead mt-3 p-2"><?php echo $rowe['contenu']; ?> </p>
                         <hr class="my-4">
                         <div class="d-flex justify-content-between px-2">
@@ -166,7 +166,8 @@ if (isset($_POST["submit"])) {
                                     class="text-danger"><?php echo $rowe['First_name']. ' ' . $rowe['Last_name'] ; ?></span>
                             </p>
                             <p class="text-end">Poser le : <span
-                                    class="text-primary"><?php echo $rowe['date_creation']; ?></span></p>
+                                    class="text-primary"><?php echo date('d/m/Y', strtotime($rowe['date_creation'])); ?></span>
+                            </p>
                         </div>
                     </div>
                     <h2 class="fw-lighter text-primary mt-3">Réponses</h2>
@@ -182,7 +183,7 @@ if (mysqli_num_rows($result) == 0) {
     while ($row = mysqli_fetch_assoc($result)) {
         ?>
 
-                    <div class="jumbotron bg w-75 mt-2 w5">
+                    <div class="jumbotron bg w-75 mt-2 w5 shadow p-3 mb-5 bg-body rounded">
                         <div class="d-flex justify-content-between pt-2 px-2 gap-3">
                             <?php
                 if ($role == 'scrum_master') {
@@ -219,7 +220,8 @@ if (mysqli_num_rows($result) == 0) {
 
 
                             <p class="text-center"> <span
-                                    class="text-primary text-center"><?php echo $row['date_creation']; ?></span></p>
+                                    class="text-primary text-center"><?php echo date('d/m/Y', strtotime($row['date_creation'])); ?></span>
+                            </p>
                         </div>
 
                         <p class="lead  px-2 " style="overflow-wrap: break-word; word-wrap: break-word;">
